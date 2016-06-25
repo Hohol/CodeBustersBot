@@ -1,0 +1,6 @@
+.idea
+/out
+/output
+CHelperReport.txt
+*.task
+*.template
