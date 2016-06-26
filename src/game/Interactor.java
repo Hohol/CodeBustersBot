@@ -1,10 +1,7 @@
 package game;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static game.MoveType.*;
 import static game.Utils.*;
@@ -20,6 +17,7 @@ public class Interactor {
 
         BestMoveFinder bestMoveFinder = new BestMoveFinder();
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
+        Arrays.fill(lastStunUsed, -STUN_COOLDOWN - 5);
         int round = 0;
         while (true) {
             List<Buster> myBusters = new ArrayList<>();
