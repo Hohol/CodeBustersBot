@@ -49,4 +49,36 @@ public class Move {
         }
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        Move move = (Move) o;
+
+        if (x != move.x) return false;
+        if (y != move.y) return false;
+        if (targetId != move.targetId) return false;
+        if (type != move.type) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + x;
+        result = 31 * result + y;
+        result = 31 * result + targetId;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Move{" +
+                "type=" + type +
+                ", x=" + x +
+                ", y=" + y +
+                ", targetId=" + targetId +
+                '}';
+    }
 }

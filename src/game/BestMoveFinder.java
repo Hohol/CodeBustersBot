@@ -81,8 +81,9 @@ public class BestMoveFinder {
         if (dist(buster, myBasePosition) <= RELEASE_RANGE) {
             return Move.release();
         } else {
-
-            return Move.move(myBasePosition);
+            return Move.move(
+                    moveToWithAllowedRange(buster.x, buster.y, myBasePosition.x, myBasePosition.y, MOVE_DIST, RELEASE_RANGE)
+            );
         }
     }
 
