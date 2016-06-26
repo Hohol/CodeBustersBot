@@ -3,6 +3,9 @@ package game;
 import static java.lang.Math.*;
 
 public class Utils {
+    static final int W = 16001;
+    static final int H = 9001;
+
     public static double dist(Buster buster, Point p) {
         return dist(buster.x, buster.y, p.x, p.y);
     }
