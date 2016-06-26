@@ -16,10 +16,13 @@ public class Interactor {
 
         BestMoveFinder bestMoveFinder = new BestMoveFinder();
         Point[] destinations = new Point[bustersPerPlayer * 2];
+        int[] lastStunUsed = new int[bustersPerPlayer * 2];
+        int round = 0;
         while (true) {
             List<Buster> myBusters = new ArrayList<>();
             List<Buster> enemyBusters = new ArrayList<>();
             List<Ghost> ghosts = new ArrayList<>();
+
             int entities = in.nextInt(); // the number of busters and ghosts visible to you
             for (int i = 0; i < entities; i++) {
                 int entityId = in.nextInt(); // buster id or ghost id
@@ -32,7 +35,7 @@ public class Interactor {
                 if (entityType == -1) {
                     ghosts.add(new Ghost(x, y, entityId));
                 } else {
-                    Buster buster = buildBuster(entityId, x, y, state, value);
+                    Buster buster = buildBuster(entityId, x, y, state, value, lastStunUsed[entityId], round);
                     if (entityType == myTeamId) {
                         myBusters.add(buster);
                     } else {
@@ -43,12 +46,18 @@ public class Interactor {
             myBusters.sort(Comparator.comparing(Buster::getId));
             for (Buster buster : myBusters) {
                 Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, destinations);
+                if (move.type == MoveType.STUN) {
+                    lastStunUsed[buster.id] = round;
+                }
                 System.out.println(move.toInteractorString());
             }
+            round++;
         }
     }
 
-    private Buster buildBuster(int id, int x, int y, int state, int value) {
+    private Buster buildBuster(int id, int x, int y, int state, int value, int lastStunUsed, int round) {
+        int stunDelta = round - lastStunUsed;
+        int remainingStunCooldown = stunDelta < STUN_COOLDOWN ? STUN_COOLDOWN - stunDelta : 0;
         int remainingStunDuration = 0;
         boolean isCarryingGhost = false;
         if (state == 1) {
@@ -56,6 +65,6 @@ public class Interactor {
         } else if (state == 2) {
             remainingStunDuration = value;
         }
-        return new Buster(id, x, y, isCarryingGhost, remainingStunDuration);
+        return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown);
     }
 }

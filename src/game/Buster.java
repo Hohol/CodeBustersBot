@@ -6,13 +6,15 @@ public class Buster {
     public final boolean isCarryingGhost;
     public final int id;
     public final int remainingStunDuration;
+    public final int remainingStunCooldown;
 
-    public Buster(int id, int x, int y, boolean isCarryingGhost, int remainingStunDuration) {
+    public Buster(int id, int x, int y, boolean isCarryingGhost, int remainingStunDuration, int remainingStunCooldown) {
         this.x = x;
         this.y = y;
         this.isCarryingGhost = isCarryingGhost;
         this.id = id;
         this.remainingStunDuration = remainingStunDuration;
+        this.remainingStunCooldown = remainingStunCooldown;
     }
 
     public int getId() {

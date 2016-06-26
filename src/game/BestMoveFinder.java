@@ -7,14 +7,6 @@ import static game.Utils.*;
 import static game.Utils.dist;
 
 public class BestMoveFinder {
-    static final int MAX_BUST_RANGE = 1760;
-    static final int MIN_BUST_RANGE = 900;
-    static final int RELEASE_RANGE = 1600;
-    static final int FOG_RANGE = 2200;
-    static final int STUN_RANGE = 1760;
-    static final int STUN_COOLDOWN = 20;
-    static final int STUN_DURATION = 10;
-
     Random rnd = new Random();
 
     public Move findBestMove(Buster buster, Point myBasePosition, List<Buster> enemies, List<Ghost> ghosts, Point[] destinations) {
@@ -41,6 +33,9 @@ public class BestMoveFinder {
     }
 
     private Move tryStunEnemy(Buster buster, List<Buster> enemies) {
+        if (buster.remainingStunCooldown > 0) {
+            return null;
+        }
         for (Buster enemy : enemies) {
             if (enemy.remainingStunDuration > 0) {
                 continue; // todo stun if remainingStunDuration == 1?
