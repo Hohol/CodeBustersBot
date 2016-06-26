@@ -1,10 +1,13 @@
 package game;
 
-import java.util.*;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
 
+import static game.MoveType.*;
 import static game.Utils.*;
-import static game.Utils.dist;
 
 public class Interactor {
 
@@ -33,7 +36,7 @@ public class Interactor {
                 int value = in.nextInt(); // For busters: Ghost id being carried. For ghosts: number of busters attempting to trap this ghost.
 
                 if (entityType == -1) {
-                    ghosts.add(new Ghost(x, y, entityId));
+                    ghosts.add(new Ghost(entityId, x, y, state));
                 } else {
                     Buster buster = buildBuster(entityId, x, y, state, value, lastStunUsed[entityId], round);
                     if (entityType == myTeamId) {
@@ -46,13 +49,30 @@ public class Interactor {
             myBusters.sort(Comparator.comparing(Buster::getId));
             for (Buster buster : myBusters) {
                 Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, destinations);
-                if (move.type == MoveType.STUN) {
+                if (move.type == STUN) {
                     lastStunUsed[buster.id] = round;
                 }
-                System.out.println(move.toInteractorString());
+                printMove(move, ghosts);
             }
             round++;
         }
+    }
+
+    private void printMove(Move move, List<Ghost> ghosts) {
+        System.out.println(move.toInteractorString() + " " + getMessage(move, ghosts));
+    }
+
+    private String getMessage(Move move, List<Ghost> ghosts) {
+        return "";
+    }
+
+    private Ghost getWithId(List<Ghost> ghosts, int id) {
+        for (Ghost ghost : ghosts) {
+            if (ghost.id == id) {
+                return ghost;
+            }
+        }
+        throw new RuntimeException();
     }
 
     private Buster buildBuster(int id, int x, int y, int state, int value, int lastStunUsed, int round) {
