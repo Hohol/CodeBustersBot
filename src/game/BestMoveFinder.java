@@ -5,24 +5,24 @@ import java.util.List;
 import static game.Utils.*;
 
 public class BestMoveFinder {
-    public Move findBestMove(Buster buster, Point myBasePosition, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints) {
+    public Move findBestMove(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints) {
         if (buster.remainingStunDuration > 0) {
             return Move.release();
         }
 
-        boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBasePosition);
+        boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
 
         Move move;
-        if ((move = tryCarryGhost(buster, myBasePosition)) != null) {
+        if ((move = tryStunEnemy(buster, enemies)) != null) {
             return move;
         }
-        if ((move = tryStunEnemy(buster, enemies)) != null) {
+        if ((move = tryCarryGhost(buster, myBase)) != null) {
             return move;
         }
         if ((move = tryBustGhost(buster, ghosts, iVeSeenItAll)) != null) {
             return move;
         }
-        if ((move = tryGoToNearestGhost(buster, ghosts, iVeSeenItAll)) != null) {
+        if ((move = tryGoToNearestGhost(buster, ghosts, iVeSeenItAll, myBase)) != null) {
             return move;
         }
 
@@ -60,12 +60,16 @@ public class BestMoveFinder {
         return null;
     }
 
-    private Move tryGoToNearestGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {
+    private Move tryGoToNearestGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll, Point myBase) {
         Ghost ghost = pickNearestGhost(buster, ghosts, iVeSeenItAll);
         if (ghost == null) {
             return null;
         }
-        return Move.move(ghost.x, ghost.y);
+        if (dist(buster, ghost) >= MAX_BUST_RANGE) {
+            return Move.move(ghost.x, ghost.y);
+        } else {
+            return Move.move(myBase);
+        }
     }
 
     private Move tryBustGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {
