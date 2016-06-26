@@ -29,6 +29,10 @@ public class Utils {
         return dist(a.x, a.y, b.x, b.y);
     }
 
+    public static double dist(Point a, Point b) {
+        return dist(a.x, a.y, b.x, b.y);
+    }
+
     public static long sqr(int x) {
         return x * x;
     }
