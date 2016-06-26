@@ -75,6 +75,9 @@ public class Interactor {
         int m = 6;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
+                if (i == 0 && j == 0 || i == n - 1 && j == m - 1) {
+                    continue;
+                }
                 int x = (int) Math.round((double) i * H / (n - 1));
                 int y = (int) Math.round((double) j * W / (m - 1));
                 r.add(new CheckPoint(new Point(x, y)));
