@@ -28,17 +28,35 @@ public class BestMoveFinder {
                 return Move.move(myBasePosition);
             }
         } else {
-            Ghost targetGhost = pickGhost(buster, ghosts);
-            if (targetGhost == null) {
-                Point dest = getDestination(buster, destinations);
-                return Move.move(dest);
+            Ghost bustableGhost = pickBustableGhost(buster, ghosts);
+            if (bustableGhost != null) {
+                return Move.bust(bustableGhost.id);
             } else {
-                return Move.bust(targetGhost.id);
+                if (ghosts.isEmpty()) {
+                    Point dest = getRandomDestination(buster, destinations);
+                    return Move.move(dest);
+                } else {
+                    Ghost ghost = pickNearestGhost(buster, ghosts);
+                    return Move.move(ghost.x, ghost.y);
+                }
             }
         }
     }
 
-    private Point getDestination(Buster buster, Point[] destinations) {
+    private Ghost pickNearestGhost(Buster buster, List<Ghost> ghosts) {
+        Ghost nearest = null;
+        double minDist = Double.POSITIVE_INFINITY;
+        for (Ghost ghost : ghosts) {
+            double dist = dist(buster, ghost);
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = ghost;
+            }
+        }
+        return nearest;
+    }
+
+    private Point getRandomDestination(Buster buster, Point[] destinations) {
         Point oldDestination = destinations[buster.id];
         if (oldDestination == null || oldDestination.x == buster.x && oldDestination.y == buster.y) {
             destinations[buster.id] = new Point(rnd.nextInt(H + 1), rnd.nextInt(W + 1));
@@ -46,7 +64,7 @@ public class BestMoveFinder {
         return destinations[buster.id];
     }
 
-    private Ghost pickGhost(Buster buster, List<Ghost> ghosts) {
+    private Ghost pickBustableGhost(Buster buster, List<Ghost> ghosts) {
         for (Ghost ghost : ghosts) {
             double range = dist(buster, ghost);
             if (range >= MIN_BUST_RANGE && range <= MAX_BUST_RANGE) {
