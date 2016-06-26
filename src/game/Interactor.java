@@ -12,13 +12,13 @@ import static game.Utils.*;
 public class Interactor {
 
     public void solve(int testNumber, Scanner in, PrintWriter out) {
+        List<CheckPoint> checkPoints = genCheckPoints();
         int bustersPerPlayer = in.nextInt(); // the amount of busters you control
         int ghostCount = in.nextInt(); // the amount of ghosts on the map
         int myTeamId = in.nextInt(); // if this is 0, your base is on the top left of the map, if it is one, on the bottom right
         Point myBasePosition = myTeamId == 0 ? new Point(0, 0) : new Point(H, W);
 
         BestMoveFinder bestMoveFinder = new BestMoveFinder();
-        Point[] destinations = new Point[bustersPerPlayer * 2];
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
         int round = 0;
         while (true) {
@@ -47,8 +47,9 @@ public class Interactor {
                 }
             }
             myBusters.sort(Comparator.comparing(Buster::getId));
+            updateCheckpoints(myBusters, checkPoints, round);
             for (Buster buster : myBusters) {
-                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, destinations);
+                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, checkPoints);
                 if (move.type == STUN) {
                     lastStunUsed[buster.id] = round;
                 }
@@ -58,21 +59,36 @@ public class Interactor {
         }
     }
 
+    private void updateCheckpoints(List<Buster> myBusters, List<CheckPoint> checkPoints, int round) {
+        for (Buster myBuster : myBusters) {
+            for (CheckPoint checkPoint : checkPoints) {
+                if (dist(myBuster, checkPoint.p) <= FOG_RANGE) {
+                    checkPoint.lastSeen = round;
+                }
+            }
+        }
+    }
+
+    private List<CheckPoint> genCheckPoints() {
+        List<CheckPoint> r = new ArrayList<>();
+        int n = 4;
+        int m = 6;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                int x = (int) Math.round((double) i * H / (n - 1));
+                int y = (int) Math.round((double) j * W / (m - 1));
+                r.add(new CheckPoint(new Point(x, y)));
+            }
+        }
+        return r;
+    }
+
     private void printMove(Move move, List<Ghost> ghosts) {
         System.out.println(move.toInteractorString() + " " + getMessage(move, ghosts));
     }
 
     private String getMessage(Move move, List<Ghost> ghosts) {
         return "";
-    }
-
-    private Ghost getWithId(List<Ghost> ghosts, int id) {
-        for (Ghost ghost : ghosts) {
-            if (ghost.id == id) {
-                return ghost;
-            }
-        }
-        throw new RuntimeException();
     }
 
     private Buster buildBuster(int id, int x, int y, int state, int value, int lastStunUsed, int round) {

@@ -1,15 +1,11 @@
 package game;
 
 import java.util.List;
-import java.util.Random;
 
 import static game.Utils.*;
-import static game.Utils.dist;
 
 public class BestMoveFinder {
-    Random rnd = new Random();
-
-    public Move findBestMove(Buster buster, Point myBasePosition, List<Buster> enemies, List<Ghost> ghosts, Point[] destinations) {
+    public Move findBestMove(Buster buster, Point myBasePosition, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints) {
         if (buster.remainingStunDuration > 0) {
             return Move.release();
         }
@@ -28,8 +24,23 @@ public class BestMoveFinder {
             return move;
         }
 
-        Point dest = getRandomDestination(buster, destinations);
+        Point dest = getCheckPoint(buster, checkPoints);
         return Move.move(dest);
+    }
+
+    private Point getCheckPoint(Buster buster, List<CheckPoint> checkPoints) {
+        int minLastSeen = Integer.MAX_VALUE;
+        double minDist = Double.POSITIVE_INFINITY;
+        Point r = null;
+        for (CheckPoint checkPoint : checkPoints) {
+            double dist = dist(buster, checkPoint.p);
+            if (checkPoint.lastSeen < minLastSeen || checkPoint.lastSeen == minLastSeen && dist < minDist) {
+                minLastSeen = checkPoint.lastSeen;
+                minDist = dist;
+                r = checkPoint.p;
+            }
+        }
+        return r;
     }
 
     private Move tryStunEnemy(Buster buster, List<Buster> enemies) {
@@ -70,6 +81,7 @@ public class BestMoveFinder {
         if (dist(buster, myBasePosition) <= RELEASE_RANGE) {
             return Move.release();
         } else {
+
             return Move.move(myBasePosition);
         }
     }
@@ -85,14 +97,6 @@ public class BestMoveFinder {
             }
         }
         return nearest;
-    }
-
-    private Point getRandomDestination(Buster buster, Point[] destinations) {
-        Point oldDestination = destinations[buster.id];
-        if (oldDestination == null || oldDestination.x == buster.x && oldDestination.y == buster.y) {
-            destinations[buster.id] = new Point(rnd.nextInt(H + 1), rnd.nextInt(W + 1));
-        }
-        return destinations[buster.id];
     }
 
     private Ghost pickBustableGhost(Buster buster, List<Ghost> ghosts) {
