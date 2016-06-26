@@ -18,6 +18,7 @@ public class Interactor {
         Point[] destinations = new Point[bustersPerPlayer * 2];
         while (true) {
             List<Buster> myBusters = new ArrayList<>();
+            List<Buster> enemyBusters = new ArrayList<>();
             List<Ghost> ghosts = new ArrayList<>();
             int entities = in.nextInt(); // the number of busters and ghosts visible to you
             for (int i = 0; i < entities; i++) {
@@ -28,15 +29,20 @@ public class Interactor {
                 int state = in.nextInt(); // For busters: 0=idle, 1=carrying a ghost.
                 int value = in.nextInt(); // For busters: Ghost id being carried. For ghosts: number of busters attempting to trap this ghost.
 
-                if (entityType == myTeamId) {
-                    myBusters.add(buildBuster(entityId, x, y, state, value));
-                } else if (entityType == -1) {
+                if (entityType == -1) {
                     ghosts.add(new Ghost(x, y, entityId));
+                } else {
+                    Buster buster = buildBuster(entityId, x, y, state, value);
+                    if (entityType == myTeamId) {
+                        myBusters.add(buster);
+                    } else {
+                        enemyBusters.add(buster);
+                    }
                 }
             }
             myBusters.sort(Comparator.comparing(Buster::getId));
             for (Buster buster : myBusters) {
-                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, ghosts, destinations);
+                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, destinations);
                 System.out.println(move.toInteractorString());
             }
         }
@@ -51,11 +57,5 @@ public class Interactor {
             remainingStunDuration = value;
         }
         return new Buster(id, x, y, isCarryingGhost, remainingStunDuration);
-    }
-
-
-
-    private String move(int x, int y) {
-        return "MOVE " + y + " " + x;
     }
 }

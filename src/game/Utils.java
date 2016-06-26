@@ -17,6 +17,10 @@ public class Utils {
         return sqrt(sqr(x1 - x2) + sqr(y1 - y2));
     }
 
+    public static double dist(Buster a, Buster b) {
+        return dist(a.x, a.y, b.x, b.y);
+    }
+
     public static long sqr(int x) {
         return x * x;
     }

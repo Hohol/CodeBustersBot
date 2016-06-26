@@ -17,13 +17,16 @@ public class BestMoveFinder {
 
     Random rnd = new Random();
 
-    public Move findBestMove(Buster buster, Point myBasePosition, List<Ghost> ghosts, Point[] destinations) {
+    public Move findBestMove(Buster buster, Point myBasePosition, List<Buster> enemies, List<Ghost> ghosts, Point[] destinations) {
         if (buster.remainingStunDuration > 0) {
             return Move.release();
         }
 
         Move move;
         if ((move = tryCarryGhost(buster, myBasePosition)) != null) {
+            return move;
+        }
+        if ((move = tryStunEnemy(buster, enemies)) != null) {
             return move;
         }
         if ((move = tryBustGhost(buster, ghosts)) != null) {
@@ -35,6 +38,18 @@ public class BestMoveFinder {
 
         Point dest = getRandomDestination(buster, destinations);
         return Move.move(dest);
+    }
+
+    private Move tryStunEnemy(Buster buster, List<Buster> enemies) {
+        for (Buster enemy : enemies) {
+            if (enemy.remainingStunDuration > 0) {
+                continue; // todo stun if remainingStunDuration == 1?
+            }
+            if (dist(buster, enemy) <= STUN_RANGE) {
+                return Move.stun(enemy.getId());
+            }
+        }
+        return null;
     }
 
     private Move tryGoToNearestGhost(Buster buster, List<Ghost> ghosts) {
