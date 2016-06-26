@@ -21,25 +21,46 @@ public class BestMoveFinder {
         if (buster.remainingStunDuration > 0) {
             return Move.release();
         }
-        if (buster.isCarryingGhost) {
-            if (dist(buster, myBasePosition) <= RELEASE_RANGE) {
-                return Move.release();
-            } else {
-                return Move.move(myBasePosition);
-            }
+
+        Move move;
+        if ((move = tryCarryGhost(buster, myBasePosition)) != null) {
+            return move;
+        }
+        if ((move = tryBustGhost(buster, ghosts)) != null) {
+            return move;
+        }
+        if ((move = tryGoToNearestGhost(buster, ghosts)) != null) {
+            return move;
+        }
+
+        Point dest = getRandomDestination(buster, destinations);
+        return Move.move(dest);
+    }
+
+    private Move tryGoToNearestGhost(Buster buster, List<Ghost> ghosts) {
+        if (ghosts.isEmpty()) {
+            return null;
+        }
+        Ghost ghost = pickNearestGhost(buster, ghosts);
+        return Move.move(ghost.x, ghost.y);
+    }
+
+    private Move tryBustGhost(Buster buster, List<Ghost> ghosts) {
+        Ghost bustableGhost = pickBustableGhost(buster, ghosts);
+        if (bustableGhost == null) {
+            return null;
+        }
+        return Move.bust(bustableGhost.id);
+    }
+
+    private Move tryCarryGhost(Buster buster, Point myBasePosition) {
+        if (!buster.isCarryingGhost) {
+            return null;
+        }
+        if (dist(buster, myBasePosition) <= RELEASE_RANGE) {
+            return Move.release();
         } else {
-            Ghost bustableGhost = pickBustableGhost(buster, ghosts);
-            if (bustableGhost != null) {
-                return Move.bust(bustableGhost.id);
-            } else {
-                if (ghosts.isEmpty()) {
-                    Point dest = getRandomDestination(buster, destinations);
-                    return Move.move(dest);
-                } else {
-                    Ghost ghost = pickNearestGhost(buster, ghosts);
-                    return Move.move(ghost.x, ghost.y);
-                }
-            }
+            return Move.move(myBasePosition);
         }
     }
 
