@@ -37,15 +37,15 @@ public class EvaluationState {
         if (iHaveStun != st.iHaveStun) {
             return iHaveStun;
         }
-        if (!iHaveStun) {
-            if (iCanBeStunned != st.iCanBeStunned) {
-                return !iCanBeStunned;
-            }
-        }
         if (isCarryingGhost != st.isCarryingGhost) {
             return isCarryingGhost;
         }
         if (isCarryingGhost) {
+            if (!iHaveStun) {
+                if (iCanBeStunned != st.iCanBeStunned) {
+                    return !iCanBeStunned;
+                }
+            }
             if (inReleaseRange != st.inReleaseRange) {
                 return inReleaseRange;
             }
