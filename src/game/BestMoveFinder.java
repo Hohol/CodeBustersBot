@@ -6,7 +6,6 @@ import java.util.Set;
 
 import static game.Move.*;
 import static game.Utils.*;
-import static java.lang.Math.*;
 
 public class BestMoveFinder {
 
@@ -18,7 +17,16 @@ public class BestMoveFinder {
         evaluator = new Evaluator(gameParameters);
     }
 
-    public Move findBestMove(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints, Set<Integer> alreadyStunnedEnemies) {
+    public Move findBestMove(
+            Buster buster,
+            Point myBase,
+            List<Buster> allies,
+            List<Buster> enemies,
+            List<Ghost> ghosts,
+            List<CheckPoint> checkPoints,
+            Set<Integer> alreadyStunnedEnemies,
+            Set<Integer> alreadyBusted
+    ) {
         if (buster.remainingStunDuration > 0) {
             return release();
         }
@@ -35,7 +43,7 @@ public class BestMoveFinder {
             ghosts = removeFatGhosts(ghosts);
         }
         Point checkPoint = getCheckPoint(buster, checkPoints);
-        return trySomethingSmart(buster, myBase, enemies, ghosts, checkPoint);
+        return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted);
     }
 
     private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
@@ -48,12 +56,12 @@ public class BestMoveFinder {
         return r;
     }
 
-    private Move trySomethingSmart(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, Point checkPoint) {
+    private Move trySomethingSmart(Buster buster, Point myBase, List<Buster> allies, List<Buster> enemies, List<Ghost> ghosts, Point checkPoint, Set<Integer> alreadyBusted) {
         List<Move> possibleMoves = new ArrayList<>();
         possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.MOVE_RANGE, gameParameters.RELEASE_RANGE)));
         possibleMoves.add(move(buster.x, buster.y));
         for (Buster enemy : enemies) {
-            possibleMoves.add(runawayMove(buster, enemy));
+            possibleMoves.add(move(runawayPoint(enemy.x, enemy.y, buster.x, buster.y, gameParameters.MOVE_RANGE)));
         }
         for (Ghost ghost : ghosts) {
             if (dist(buster, ghost) >= gameParameters.MIN_BUST_RANGE && dist(buster, ghost) <= gameParameters.MAX_BUST_RANGE) {
@@ -67,23 +75,13 @@ public class BestMoveFinder {
         EvaluationState bestEvaluation = null;
         for (Move move : possibleMoves) {
             Point newPosition = getNewPosition(buster, move);
-            EvaluationState evaluation = evaluator.evaluate(buster, newPosition, myBase, enemies, ghosts, move, checkPoint);
+            EvaluationState evaluation = evaluator.evaluate(buster, newPosition, myBase, allies, enemies, ghosts, move, checkPoint, alreadyBusted);
             if (evaluation.better(bestEvaluation)) {
                 bestEvaluation = evaluation;
                 bestMove = move;
             }
         }
         return bestMove;
-    }
-
-    private Move runawayMove(Buster buster, Buster enemy) {
-        if (buster.x == enemy.x && buster.y == enemy.y) {
-            return move(buster.x, buster.y);
-        }
-        double alpha = atan2(buster.y - enemy.y, buster.x - enemy.x);
-        double newX = buster.x + gameParameters.MOVE_RANGE * cos(alpha);
-        double newY = buster.y + gameParameters.MOVE_RANGE * sin(alpha);
-        return move(Point.round(newX, newY));
     }
 
     private Point getNewPosition(Buster buster, Move move) {

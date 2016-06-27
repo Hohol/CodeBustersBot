@@ -11,4 +11,5 @@ public class GameParameters {
     int STUN_COOLDOWN = 20;
     int STUN_DURATION = 10;
     int MOVE_RANGE = 800;
+    int GHOST_MOVE_RANGE = 400;
 }

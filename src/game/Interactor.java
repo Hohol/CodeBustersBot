@@ -37,7 +37,7 @@ public class Interactor {
                 int value = in.nextInt(); // For busters: Ghost id being carried. For ghosts: number of busters attempting to trap this ghost.
 
                 if (entityType == -1) {
-                    ghosts.add(new Ghost(entityId, x, y, state));
+                    ghosts.add(new Ghost(entityId, x, y, state, value));
                 } else {
                     Buster buster = buildBuster(entityId, x, y, state, value, lastStunUsed[entityId], round, gameParameters);
                     if (entityType == myTeamId) {
@@ -51,11 +51,15 @@ public class Interactor {
             myBusters.sort(Comparator.comparing(Buster::getId));
             updateCheckpoints(myBusters, checkPoints, round, gameParameters);
             Set<Integer> alreadyStunnedEnemies = new HashSet<>();
+            Set<Integer> alreadyBusted = new HashSet<>();
             for (Buster buster : myBusters) {
-                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, checkPoints, alreadyStunnedEnemies);
+                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, myBusters, enemyBusters, ghosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
                 if (move.type == STUN) {
                     lastStunUsed[buster.id] = round;
                     alreadyStunnedEnemies.add(move.targetId);
+                }
+                if (move.type == BUST) {
+                    alreadyBusted.add(move.targetId);
                 }
                 printMove(buster, move, ghosts);
             }

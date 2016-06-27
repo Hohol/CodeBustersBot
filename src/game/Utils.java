@@ -1,5 +1,6 @@
 package game;
 
+import static game.Move.move;
 import static java.lang.Math.*;
 
 public class Utils {
@@ -42,6 +43,7 @@ public class Utils {
         double dx = (toX - fromX) * w;
         double dy = (toY - fromY) * w;
         int rx = roundTo(fromX + dx, toX);
+        //noinspection SuspiciousNameCombination
         int ry = roundTo(fromY + dy, toY);
         return new Point(rx, ry);
     }
@@ -52,5 +54,15 @@ public class Utils {
         } else {
             return (int) Math.floor(x);
         }
+    }
+
+    static Point runawayPoint(int scaryX, int scaryY, int x, int y, int moveRange) {
+        if (x == scaryX && y == scaryY) {
+            return new Point(x, y);
+        }
+        double alpha = atan2(y - scaryY, x - scaryX);
+        double newX = x + moveRange * cos(alpha);
+        double newY = y + moveRange * sin(alpha);
+        return Point.round(newX, newY);
     }
 }

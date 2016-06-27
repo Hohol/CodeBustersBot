@@ -3,31 +3,27 @@ package game;
 public class EvaluationState {
     private final boolean iCanBeStunned;
     private final boolean iHaveStun;
-    private final int totalGhostStamina;
     private final boolean isCarryingGhost;
-    private final double pseudoDistToNearestGhost;
     private final double distToCheckPoint;
     private final double distToBase;
     private final boolean inReleaseRange;
+    private final Evaluator.MovesAndDist movesAndDistToBustGhost;
 
     public EvaluationState(
             boolean iCanBeStunned,
             boolean iHaveStun,
-            int totalGhostStamina,
             boolean isCarryingGhost,
-            double pseudoDistToNearestGhost,
             double distToCheckPoint,
             double distToBase,
-            boolean inReleaseRange
-    ) {
+            boolean inReleaseRange,
+            Evaluator.MovesAndDist movesAndDistToBustGhost) {
         this.iCanBeStunned = iCanBeStunned;
         this.iHaveStun = iHaveStun;
-        this.totalGhostStamina = totalGhostStamina;
         this.isCarryingGhost = isCarryingGhost;
-        this.pseudoDistToNearestGhost = pseudoDistToNearestGhost;
         this.distToCheckPoint = distToCheckPoint;
         this.distToBase = distToBase;
         this.inReleaseRange = inReleaseRange;
+        this.movesAndDistToBustGhost = movesAndDistToBustGhost;
     }
 
     public boolean better(EvaluationState st) {
@@ -55,11 +51,9 @@ public class EvaluationState {
                 }
             }
         }
-        if (totalGhostStamina != st.totalGhostStamina) {
-            return totalGhostStamina < st.totalGhostStamina;
-        }
-        if (pseudoDistToNearestGhost != st.pseudoDistToNearestGhost) {
-            return pseudoDistToNearestGhost < st.pseudoDistToNearestGhost;
+        int compareMovesAndDist = movesAndDistToBustGhost.compareTo(st.movesAndDistToBustGhost);
+        if (compareMovesAndDist != 0) {
+            return compareMovesAndDist < 0;
         }
         if (distToCheckPoint != st.distToCheckPoint) {
             return distToCheckPoint < st.distToCheckPoint;

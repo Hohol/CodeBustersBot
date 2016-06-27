@@ -3,9 +3,7 @@ package game;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.testng.Assert.assertEquals;
 
@@ -20,12 +18,13 @@ public class AbstractBestMoveFinderTest {
         testGameParameters = new GameParameters();
         testGameParameters.W = 50;
         testGameParameters.H = 50;
-        testGameParameters.FOG_RANGE = 2200;
+        testGameParameters.FOG_RANGE = 7;
         testGameParameters.MAX_BUST_RANGE = 6;
         testGameParameters.STUN_RANGE = 5;
         testGameParameters.RELEASE_RANGE = 4;
         testGameParameters.MIN_BUST_RANGE = 3;
         testGameParameters.MOVE_RANGE = 2;
+        testGameParameters.GHOST_MOVE_RANGE = 1;
 
         bestMoveFinder = new BestMoveFinder(testGameParameters);
         testBuilder = new TestBuilder();
@@ -36,6 +35,7 @@ public class AbstractBestMoveFinderTest {
         List<BusterBuilder> allies = new ArrayList<>();
         List<BusterBuilder> enemies = new ArrayList<>();
         List<Ghost> ghosts = new ArrayList<>();
+        Set<Integer> alreadyBusted = new HashSet<>();
 
         BusterBuilder ally(int x, int y) {
             int id = allies.size() + enemies.size();
@@ -61,8 +61,16 @@ public class AbstractBestMoveFinderTest {
     }
 
     protected void ghost(int x, int y, int stamina) {
+        ghost(x, y, stamina, 0);
+    }
+
+    protected void ghost(int x, int y, int stamina, int bustCnt) {
         int id = testBuilder.ghosts.size();
-        testBuilder.ghosts.add(new Ghost(id, x, y, stamina));
+        testBuilder.ghosts.add(new Ghost(id, x, y, stamina, bustCnt));
+    }
+
+    protected void alreadyBusted(int ghostId) {
+        testBuilder.alreadyBusted.add(ghostId);
     }
 
     protected void checkMove(Move move) {
@@ -70,12 +78,14 @@ public class AbstractBestMoveFinderTest {
                 bestMoveFinder.findBestMove(
                         testBuilder.allies.get(0).build(),
                         testBuilder.myBase,
+                        buildBusters(testBuilder.allies),
                         buildBusters(testBuilder.enemies),
                         testBuilder.ghosts,
                         Collections.singletonList(
                                 new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2))
                         ),
-                        Collections.emptySet()
+                        Collections.emptySet(),
+                        testBuilder.alreadyBusted
                 ),
                 move
         );

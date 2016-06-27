@@ -101,17 +101,47 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
     }
 
     @Test
-    void testBug3() {
-        testGameParameters.MOVE_RANGE = 3;
-        ally(2, 25);
-        ghost(0, 25, 3);
-        checkMove(move(25, 25));
-    }
-
-    @Test
     void dontFearEnemyIfYouHaveNoGhost() {
         ally(0, 25).stunCooldown(20);
         enemy(6, 25);
         checkMove(move(25, 25));
+    }
+
+    @Test
+    void testGhostPriority() {
+        ally(0, 10);
+        ghost(0, 18, 0);
+        ghost(3, 10, 20);
+        checkMove(move(0, 18));
+    }
+
+    @Test
+    void ghostRunsAway() {
+        ally(0, 10);
+        ghost(0, 12, 3);
+        checkMove(move(0, 10));
+    }
+
+    @Test
+    void ghostDoesntRunAwayIfHeWasBustedOnPreviousMove() {
+        ally(0, 10);
+        ghost(0, 12, 3, 1);
+        checkMove(move(0, 4));
+    }
+
+    @Test
+    void ghostDoesntRunAwayIfSomeAllyStartedToBustHimOnThisMove() {
+        ally(0, 10);
+        ghost(0, 12, 3);
+        alreadyBusted(0);
+        checkMove(move(0, 4));
+    }
+
+    @Test
+    void minimizeDistToGhost() {
+        ally(24, 25);
+        ghost(31, 25, 3);
+        alreadyBusted(0);
+        checkMove(move(31, 25));
     }
 }
