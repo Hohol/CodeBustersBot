@@ -128,8 +128,8 @@ public class BestMoveFinder {
             return null;
         }
         for (Buster enemy : enemies) {
-            if (enemy.remainingStunDuration > 0) {
-                continue; // todo stun if remainingStunDuration == 1?
+            if (enemy.remainingStunDuration > 1) {
+                continue;
             }
             if (alreadyStunnedEnemies.contains(enemy.id)) {
                 continue;
