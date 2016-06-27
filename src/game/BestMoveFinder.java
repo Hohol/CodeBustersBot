@@ -1,10 +1,10 @@
 package game;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static game.Move.*;
 import static game.Utils.*;
 import static java.lang.Math.*;
 
@@ -20,10 +20,8 @@ public class BestMoveFinder {
 
     public Move findBestMove(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints, Set<Integer> alreadyStunnedEnemies) {
         if (buster.remainingStunDuration > 0) {
-            return Move.release();
+            return release();
         }
-
-        boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
 
         Move move;
         if ((move = tryReleaseGhost(buster, myBase)) != null) {
@@ -32,39 +30,44 @@ public class BestMoveFinder {
         if ((move = tryStunEnemy(buster, enemies, alreadyStunnedEnemies)) != null) {
             return move;
         }
-        if ((move = tryCarryGhostAndAvoidEnemies(buster, myBase, enemies)) != null) {
-            return move;
+        boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
+        if (!iVeSeenItAll) {
+            ghosts = removeFatGhosts(ghosts);
         }
-        /*if ((move = tryCarryGhost(buster, myBase)) != null) {
-            return move;
-        }*/
-        if ((move = tryBustGhost(buster, ghosts, iVeSeenItAll)) != null) {
-            return move;
-        }
-        if ((move = tryGoToNearestGhost(buster, ghosts, iVeSeenItAll, myBase)) != null) {
-            return move;
-        }
-
-        Point dest = getCheckPoint(buster, checkPoints);
-        return Move.move(dest);
+        Point checkPoint = getCheckPoint(buster, checkPoints);
+        return trySomethingSmart(buster, myBase, enemies, ghosts, checkPoint);
     }
 
-    private Move tryCarryGhostAndAvoidEnemies(Buster buster, Point myBase, List<Buster> enemies) {
-        if (!buster.isCarryingGhost) {
-            return null;
+    private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
+        List<Ghost> r = new ArrayList<>();
+        for (Ghost ghost : ghosts) {
+            if (ghost.stamina < 30) {
+                r.add(ghost);
+            }
         }
+        return r;
+    }
+
+    private Move trySomethingSmart(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, Point checkPoint) {
         List<Move> possibleMoves = new ArrayList<>();
-        possibleMoves.add(Move.move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.MOVE_RANGE, gameParameters.RELEASE_RANGE)));
-        possibleMoves.add(Move.move(buster.x, buster.y));
+        possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.MOVE_RANGE, gameParameters.RELEASE_RANGE)));
+        possibleMoves.add(move(buster.x, buster.y));
         for (Buster enemy : enemies) {
             possibleMoves.add(runawayMove(buster, enemy));
         }
+        for (Ghost ghost : ghosts) {
+            if (dist(buster, ghost) >= gameParameters.MIN_BUST_RANGE && dist(buster, ghost) <= gameParameters.MAX_BUST_RANGE) {
+                possibleMoves.add(bust(ghost.id));
+            }
+            possibleMoves.add(move(ghost.x, ghost.y));
+        }
+        possibleMoves.add(move(checkPoint));
 
         Move bestMove = null;
         EvaluationState bestEvaluation = null;
         for (Move move : possibleMoves) {
             Point newPosition = getNewPosition(buster, move);
-            EvaluationState evaluation = evaluator.evaluate(buster, newPosition, myBase, enemies);
+            EvaluationState evaluation = evaluator.evaluate(buster, newPosition, myBase, enemies, ghosts, move, checkPoint);
             if (evaluation.better(bestEvaluation)) {
                 bestEvaluation = evaluation;
                 bestMove = move;
@@ -75,12 +78,12 @@ public class BestMoveFinder {
 
     private Move runawayMove(Buster buster, Buster enemy) {
         if (buster.x == enemy.x && buster.y == enemy.y) {
-            return Move.move(buster.x, buster.y);
+            return move(buster.x, buster.y);
         }
         double alpha = atan2(buster.y - enemy.y, buster.x - enemy.x);
         double newX = buster.x + gameParameters.MOVE_RANGE * cos(alpha);
         double newY = buster.y + gameParameters.MOVE_RANGE * sin(alpha);
-        return Move.move(Point.round(newX, newY));
+        return move(Point.round(newX, newY));
     }
 
     private Point getNewPosition(Buster buster, Move move) {
@@ -102,7 +105,7 @@ public class BestMoveFinder {
             return null;
         }
         if (dist(buster, myBase) <= gameParameters.RELEASE_RANGE) {
-            return Move.release();
+            return release();
         }
         return null;
     }
@@ -134,7 +137,7 @@ public class BestMoveFinder {
                 continue;
             }
             if (dist(buster, enemy) <= gameParameters.STUN_RANGE) {
-                return Move.stun(enemy.getId());
+                return stun(enemy.getId());
             }
         }
         return null;
@@ -146,18 +149,10 @@ public class BestMoveFinder {
             return null;
         }
         if (dist(buster, ghost) >= gameParameters.MAX_BUST_RANGE) {
-            return Move.move(ghost.x, ghost.y);
+            return move(ghost.x, ghost.y);
         } else {
-            return Move.move(myBase);
+            return move(myBase);
         }
-    }
-
-    private Move tryBustGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {
-        Ghost bustableGhost = pickBustableGhost(buster, ghosts, iVeSeenItAll);
-        if (bustableGhost == null) {
-            return null;
-        }
-        return Move.bust(bustableGhost.id);
     }
 
     private Ghost pickNearestGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {

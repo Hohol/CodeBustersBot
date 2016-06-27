@@ -18,8 +18,8 @@ public class AbstractBestMoveFinderTest {
     @BeforeMethod
     void init() {
         testGameParameters = new GameParameters();
-        testGameParameters.W = 16001;
-        testGameParameters.H = 9001;
+        testGameParameters.W = 50;
+        testGameParameters.H = 50;
         testGameParameters.FOG_RANGE = 2200;
         testGameParameters.MAX_BUST_RANGE = 6;
         testGameParameters.STUN_RANGE = 5;
@@ -35,6 +35,7 @@ public class AbstractBestMoveFinderTest {
         Point myBase = new Point(0, 0);
         List<BusterBuilder> allies = new ArrayList<>();
         List<BusterBuilder> enemies = new ArrayList<>();
+        List<Ghost> ghosts = new ArrayList<>();
 
         BusterBuilder ally(int x, int y) {
             int id = allies.size() + enemies.size();
@@ -49,28 +50,31 @@ public class AbstractBestMoveFinderTest {
             enemies.add(builder);
             return builder;
         }
-
-        void build() {
-        }
     }
 
     protected BusterBuilder ally(int x, int y) {
         return testBuilder.ally(x, y);
     }
+
     protected BusterBuilder enemy(int x, int y) {
         return testBuilder.enemy(x, y);
     }
 
-    protected void checkMove(Move move) {
-        testBuilder.build();
+    protected void ghost(int x, int y, int stamina) {
+        int id = testBuilder.ghosts.size();
+        testBuilder.ghosts.add(new Ghost(id, x, y, stamina));
+    }
 
+    protected void checkMove(Move move) {
         assertEquals(
                 bestMoveFinder.findBestMove(
                         testBuilder.allies.get(0).build(),
                         testBuilder.myBase,
                         buildBusters(testBuilder.enemies),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
+                        testBuilder.ghosts,
+                        Collections.singletonList(
+                                new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2))
+                        ),
                         Collections.emptySet()
                 ),
                 move

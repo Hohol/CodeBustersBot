@@ -7,6 +7,7 @@ public class Utils {
     public static double dist(Buster buster, Point p) {
         return dist(buster.x, buster.y, p.x, p.y);
     }
+
     public static double dist(Buster buster, Ghost p) {
         return dist(buster.x, buster.y, p.x, p.y);
     }
@@ -21,6 +22,10 @@ public class Utils {
 
     public static double dist(Point a, Point b) {
         return dist(a.x, a.y, b.x, b.y);
+    }
+
+    public static double dist(Point p, Ghost g) {
+        return dist(p.x, p.y, g.x, g.y);
     }
 
     public static long sqr(int x) {
@@ -43,9 +48,9 @@ public class Utils {
 
     private static int roundTo(double x, int toX) {
         if (toX > x) {
-            return (int)Math.ceil(x);
+            return (int) Math.ceil(x);
         } else {
-            return (int)Math.floor(x);
+            return (int) Math.floor(x);
         }
     }
 }
