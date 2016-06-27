@@ -3,16 +3,6 @@ package game;
 import static java.lang.Math.*;
 
 public class Utils {
-    static final int W = 16001;
-    static final int H = 9001;
-    static final int MAX_BUST_RANGE = 1760;
-    static final int MIN_BUST_RANGE = 900;
-    static final int RELEASE_RANGE = 1600;
-    static final int FOG_RANGE = 2200;
-    static final int STUN_RANGE = 1760;
-    static final int STUN_COOLDOWN = 20;
-    static final int STUN_DURATION = 10;
-    static final int MOVE_DIST = 800;
 
     public static double dist(Buster buster, Point p) {
         return dist(buster.x, buster.y, p.x, p.y);

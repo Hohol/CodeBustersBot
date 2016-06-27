@@ -6,6 +6,13 @@ import java.util.Set;
 import static game.Utils.*;
 
 public class BestMoveFinder {
+
+    private final GameParameters gameParameters;
+
+    public BestMoveFinder(GameParameters gameParameters) {
+        this.gameParameters = gameParameters;
+    }
+
     public Move findBestMove(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints, Set<Integer> alreadyStunnedEnemies) {
         if (buster.remainingStunDuration > 0) {
             return Move.release();
@@ -38,7 +45,7 @@ public class BestMoveFinder {
         if (!buster.isCarryingGhost) {
             return null;
         }
-        if (dist(buster, myBase) <= RELEASE_RANGE) {
+        if (dist(buster, myBase) <= gameParameters.RELEASE_RANGE) {
             return Move.release();
         }
         return null;
@@ -70,7 +77,7 @@ public class BestMoveFinder {
             if (alreadyStunnedEnemies.contains(enemy.id)) {
                 continue;
             }
-            if (dist(buster, enemy) <= STUN_RANGE) {
+            if (dist(buster, enemy) <= gameParameters.STUN_RANGE) {
                 return Move.stun(enemy.getId());
             }
         }
@@ -82,7 +89,7 @@ public class BestMoveFinder {
         if (ghost == null) {
             return null;
         }
-        if (dist(buster, ghost) >= MAX_BUST_RANGE) {
+        if (dist(buster, ghost) >= gameParameters.MAX_BUST_RANGE) {
             return Move.move(ghost.x, ghost.y);
         } else {
             return Move.move(myBase);
@@ -102,7 +109,7 @@ public class BestMoveFinder {
             return null;
         }
         return Move.move(
-                moveToWithAllowedRange(buster.x, buster.y, myBasePosition.x, myBasePosition.y, MOVE_DIST, RELEASE_RANGE)
+                moveToWithAllowedRange(buster.x, buster.y, myBasePosition.x, myBasePosition.y, gameParameters.MOVE_DIST, gameParameters.RELEASE_RANGE)
         );
     }
 
@@ -127,7 +134,7 @@ public class BestMoveFinder {
     }
 
     private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints, Point myBase) {
-        Point enemyBase = new Point(H - myBase.x, W - myBase.y);
+        Point enemyBase = new Point(gameParameters.H - myBase.x, gameParameters.W - myBase.y);
         for (CheckPoint checkPoint : checkPoints) {
             if (dist(checkPoint.p, myBase) <= dist(checkPoint.p, enemyBase)) {
                 if (checkPoint.lastSeen == CheckPoint.NEVER) {
@@ -144,7 +151,7 @@ public class BestMoveFinder {
                 continue;
             }
             double range = dist(buster, ghost);
-            if (range >= MIN_BUST_RANGE && range <= MAX_BUST_RANGE) {
+            if (range >= gameParameters.MIN_BUST_RANGE && range <= gameParameters.MAX_BUST_RANGE) {
                 return ghost;
             }
         }
