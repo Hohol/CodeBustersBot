@@ -47,6 +47,7 @@ public class Interactor {
                     }
                 }
             }
+            printGhosts(ghosts);
             printEnemies(enemyBusters);
             myBusters.sort(Comparator.comparing(Buster::getId));
             updateCheckpoints(myBusters, checkPoints, round, gameParameters);
@@ -61,10 +62,16 @@ public class Interactor {
                 if (move.type == BUST) {
                     alreadyBusted.add(move.targetId);
                 }
-                printMove(buster, move, ghosts);
+                printMove(buster, move);
             }
             round++;
             in.dump();
+        }
+    }
+
+    private void printGhosts(List<Ghost> ghosts) {
+        for (Ghost ghost : ghosts) {
+            System.err.println(ghost);
         }
     }
 
@@ -102,7 +109,7 @@ public class Interactor {
         return r;
     }
 
-    private void printMove(Buster buster, Move move, List<Ghost> ghosts) {
+    private void printMove(Buster buster, Move move) {
         System.out.println(move.toInteractorString() + " " + getMessage(buster));
     }
 
@@ -146,6 +153,7 @@ public class Interactor {
             for (int v : input) {
                 System.err.print(v + " ");
             }
+            System.err.println();
             input.clear();
         }
 
