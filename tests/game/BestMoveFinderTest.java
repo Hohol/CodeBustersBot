@@ -92,4 +92,11 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ghost(0, 11, 1);
         checkMove(move(0, 4));
     }
+
+    @Test
+    void testBug() {
+        ally(0, 5).carryingGhost().stunCooldown(20);
+        enemy(0, 50);
+        checkMove(move(0, 4));
+    }
 }

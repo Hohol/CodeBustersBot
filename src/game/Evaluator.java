@@ -20,8 +20,8 @@ public class Evaluator {
         double distToNearestGhost = getPseudoDistToNearestGhost(newMyPosition, ghosts);
         double distToCheckPoint = dist(newMyPosition, checkPoint);
         double distToBase = dist(newMyPosition, myBase);
-
-        return new EvaluationState(canBeStunned, iHaveStun, totalGhostStamina, isCarryingGhost, distToNearestGhost, distToCheckPoint, distToBase);
+        boolean inReleaseRange = distToBase <= gameParameters.RELEASE_RANGE;
+        return new EvaluationState(canBeStunned, iHaveStun, totalGhostStamina, isCarryingGhost, distToNearestGhost, distToCheckPoint, distToBase, inReleaseRange);
     }
 
     private double getPseudoDistToNearestGhost(Point newMyPosition, List<Ghost> ghosts) {

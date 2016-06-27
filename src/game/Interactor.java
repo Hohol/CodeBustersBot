@@ -8,9 +8,10 @@ import static game.Utils.*;
 
 public class Interactor {
 
-    public void solve(int testNumber, Scanner in, PrintWriter out) {
+    public void solve(int testNumber, Scanner scanner, PrintWriter out) {
         GameParameters gameParameters = new GameParameters();
         List<CheckPoint> checkPoints = genCheckPoints(gameParameters);
+        IntReader in = new IntReader(scanner);
         int bustersPerPlayer = in.nextInt(); // the amount of busters you control
         int ghostCount = in.nextInt(); // the amount of ghosts on the map
         int myTeamId = in.nextInt(); // if this is 0, your base is on the top left of the map, if it is one, on the bottom right
@@ -20,6 +21,7 @@ public class Interactor {
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
         Arrays.fill(lastStunUsed, -gameParameters.STUN_COOLDOWN - 5);
         int round = 0;
+        in.store();
         while (true) {
             List<Buster> myBusters = new ArrayList<>();
             List<Buster> enemyBusters = new ArrayList<>();
@@ -58,6 +60,7 @@ public class Interactor {
                 printMove(move, ghosts);
             }
             round++;
+            in.dump();
         }
     }
 
@@ -114,5 +117,34 @@ public class Interactor {
             remainingStunDuration = value;
         }
         return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown);
+    }
+    static class IntReader {
+        private final Scanner in;
+        List<Integer> commonInput = new ArrayList<>();
+        List<Integer> input = new ArrayList<>();
+
+        IntReader(Scanner in) {
+            this.in = in;
+        }
+        public int nextInt() {
+            int r = in.nextInt();
+            input.add(r);
+            return r;
+        }
+        public void dump() {
+            System.err.println("input dump:");
+            for (int v : commonInput) {
+                System.err.print(v + " ");
+            }
+            for (int v : input) {
+                System.err.print(v + " ");
+            }
+            input.clear();
+        }
+
+        public void store() {
+            commonInput.addAll(input);
+            input.clear();
+        }
     }
 }

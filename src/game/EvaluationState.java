@@ -8,6 +8,7 @@ public class EvaluationState {
     private final double pseudoDistToNearestGhost;
     private final double distToCheckPoint;
     private final double distToBase;
+    private final boolean inReleaseRange;
 
     public EvaluationState(
             boolean iCanBeStunned,
@@ -16,7 +17,8 @@ public class EvaluationState {
             boolean isCarryingGhost,
             double pseudoDistToNearestGhost,
             double distToCheckPoint,
-            double distToBase
+            double distToBase,
+            boolean inReleaseRange
     ) {
         this.iCanBeStunned = iCanBeStunned;
         this.iHaveStun = iHaveStun;
@@ -25,6 +27,7 @@ public class EvaluationState {
         this.pseudoDistToNearestGhost = pseudoDistToNearestGhost;
         this.distToCheckPoint = distToCheckPoint;
         this.distToBase = distToBase;
+        this.inReleaseRange = inReleaseRange;
     }
 
     public boolean better(EvaluationState st) {
@@ -43,8 +46,13 @@ public class EvaluationState {
             return isCarryingGhost;
         }
         if (isCarryingGhost) {
-            if (distToBase != st.distToBase) {
-                return distToBase < st.distToBase;
+            if (inReleaseRange != st.inReleaseRange) {
+                return inReleaseRange;
+            }
+            if (!inReleaseRange) {
+                if (distToBase != st.distToBase) {
+                    return distToBase < st.distToBase;
+                }
             }
         }
         if (totalGhostStamina != st.totalGhostStamina) {
