@@ -13,6 +13,9 @@ public class BestMoveFinder {
         boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
 
         Move move;
+        if ((move = tryReleaseGhost(buster, myBase)) != null) {
+            return move;
+        }
         if ((move = tryStunEnemy(buster, enemies)) != null) {
             return move;
         }
@@ -28,6 +31,16 @@ public class BestMoveFinder {
 
         Point dest = getCheckPoint(buster, checkPoints);
         return Move.move(dest);
+    }
+
+    private Move tryReleaseGhost(Buster buster, Point myBase) {
+        if (!buster.isCarryingGhost) {
+            return null;
+        }
+        if (dist(buster, myBase) <= RELEASE_RANGE) {
+            return Move.release();
+        }
+        return null;
     }
 
     private Point getCheckPoint(Buster buster, List<CheckPoint> checkPoints) {
@@ -84,13 +97,9 @@ public class BestMoveFinder {
         if (!buster.isCarryingGhost) {
             return null;
         }
-        if (dist(buster, myBasePosition) <= RELEASE_RANGE) {
-            return Move.release();
-        } else {
-            return Move.move(
-                    moveToWithAllowedRange(buster.x, buster.y, myBasePosition.x, myBasePosition.y, MOVE_DIST, RELEASE_RANGE)
-            );
-        }
+        return Move.move(
+                moveToWithAllowedRange(buster.x, buster.y, myBasePosition.x, myBasePosition.y, MOVE_DIST, RELEASE_RANGE)
+        );
     }
 
     private Ghost pickNearestGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {
