@@ -1,11 +1,12 @@
 package game;
 
 import java.util.List;
+import java.util.Set;
 
 import static game.Utils.*;
 
 public class BestMoveFinder {
-    public Move findBestMove(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints) {
+    public Move findBestMove(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints, Set<Integer> alreadyStunnedEnemies) {
         if (buster.remainingStunDuration > 0) {
             return Move.release();
         }
@@ -16,7 +17,7 @@ public class BestMoveFinder {
         if ((move = tryReleaseGhost(buster, myBase)) != null) {
             return move;
         }
-        if ((move = tryStunEnemy(buster, enemies)) != null) {
+        if ((move = tryStunEnemy(buster, enemies, alreadyStunnedEnemies)) != null) {
             return move;
         }
         if ((move = tryCarryGhost(buster, myBase)) != null) {
@@ -58,13 +59,16 @@ public class BestMoveFinder {
         return r;
     }
 
-    private Move tryStunEnemy(Buster buster, List<Buster> enemies) {
+    private Move tryStunEnemy(Buster buster, List<Buster> enemies, Set<Integer> alreadyStunnedEnemies) {
         if (buster.remainingStunCooldown > 0) {
             return null;
         }
         for (Buster enemy : enemies) {
             if (enemy.remainingStunDuration > 0) {
                 continue; // todo stun if remainingStunDuration == 1?
+            }
+            if (alreadyStunnedEnemies.contains(enemy.id)) {
+                continue;
             }
             if (dist(buster, enemy) <= STUN_RANGE) {
                 return Move.stun(enemy.getId());

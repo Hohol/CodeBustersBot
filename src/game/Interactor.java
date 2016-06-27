@@ -46,10 +46,12 @@ public class Interactor {
             }
             myBusters.sort(Comparator.comparing(Buster::getId));
             updateCheckpoints(myBusters, checkPoints, round);
+            Set<Integer> alreadyStunnedEnemies = new HashSet<>();
             for (Buster buster : myBusters) {
-                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, checkPoints);
+                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, enemyBusters, ghosts, checkPoints, alreadyStunnedEnemies);
                 if (move.type == STUN) {
                     lastStunUsed[buster.id] = round;
+                    alreadyStunnedEnemies.add(move.targetId);
                 }
                 printMove(move, ghosts);
             }
