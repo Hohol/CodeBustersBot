@@ -99,4 +99,12 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(0, 50);
         checkMove(move(0, 4));
     }
+
+    @Test
+    void testBug3() {
+        testGameParameters.MOVE_RANGE = 3;
+        ally(2, 25);
+        ghost(0, 25, 3);
+        checkMove(move(25, 25));
+    }
 }

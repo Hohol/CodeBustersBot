@@ -34,10 +34,13 @@ public class Evaluator {
 
     private double getPseudoDist(Point newMyPosition, Ghost ghost) {
         double dist = dist(newMyPosition, ghost);
-        if (dist >= gameParameters.MIN_BUST_RANGE) {
-            return dist;
+        if (dist >= gameParameters.MAX_BUST_RANGE) {
+            return dist - gameParameters.MAX_BUST_RANGE;
         }
-        return gameParameters.MIN_BUST_RANGE + (gameParameters.MIN_BUST_RANGE - dist);
+        if (dist >= gameParameters.MIN_BUST_RANGE) {
+            return 0;
+        }
+        return gameParameters.MIN_BUST_RANGE - dist;
     }
 
     private boolean checkIsCarryingGhost(Buster buster, Move move, List<Ghost> ghosts) {
