@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import static game.Utils.*;
-import static java.lang.Math.*;
 
 public class Evaluator {
     private final GameParameters gameParameters;
@@ -41,26 +40,23 @@ public class Evaluator {
     private List<Ghost> moveGhosts(List<Ghost> ghosts, Move move, List<Buster> allBusters, Set<Integer> alreadyBusted) {
         List<Ghost> r = new ArrayList<>();
         for (Ghost ghost : ghosts) {
-            Point mean = getMeanPoint(ghost, allBusters);
-            r.add(moveGhost(ghost, move, mean, alreadyBusted));
+            r.add(moveGhost(ghost, move, allBusters, alreadyBusted));
         }
         return r;
     }
 
-    private Point getMeanPoint(Ghost ghost, List<Buster> allBusters) {
+    private Point getMeanPoint(List<Buster> bustersWithMinDist) {
         double sumX = 0;
         double sumY = 0;
-        for (Buster buster : allBusters) {
-            if (dist(buster, ghost) > gameParameters.FOG_RANGE) {
-                continue;
-            }
+        for (Buster buster : bustersWithMinDist) {
             sumX += buster.x;
             sumY += buster.y;
         }
-        return Point.round(sumX / allBusters.size(), sumY / allBusters.size());
+        int cnt = bustersWithMinDist.size();
+        return Point.round(sumX / cnt, sumY / cnt);
     }
 
-    private Ghost moveGhost(Ghost ghost, Move move, Point mean, Set<Integer> alreadyBusted) {
+    private Ghost moveGhost(Ghost ghost, Move move, List<Buster> allBusters, Set<Integer> alreadyBusted) {
         if (ghost.bustCnt > 0) {
             return ghost;
         }
@@ -70,8 +66,32 @@ public class Evaluator {
         if (move.type == MoveType.BUST && move.targetId == ghost.id) {
             return ghost;
         }
+        List<Buster> bustersWithMinDist = getBustersInRangeWithMinDist(ghost, allBusters);
+        if (bustersWithMinDist.isEmpty()) {
+            return ghost;
+        }
+        Point mean = getMeanPoint(bustersWithMinDist);
         Point p = Utils.runawayPoint(mean.x, mean.y, ghost.x, ghost.y, gameParameters.GHOST_MOVE_RANGE);
         return new Ghost(ghost.id, p.x, p.y, ghost.stamina, ghost.bustCnt);
+    }
+
+    private List<Buster> getBustersInRangeWithMinDist(Ghost ghost, List<Buster> allBusters) {
+        double minDist = Double.POSITIVE_INFINITY;
+        List<Buster> r = new ArrayList<>();
+        for (Buster buster : allBusters) {
+            double dist = dist(buster, ghost);
+            if (dist > gameParameters.FOG_RANGE) {
+                continue;
+            }
+            if (dist < minDist) {
+                minDist = dist;
+                r.clear();
+                r.add(buster);
+            } else if (dist == minDist) {
+                r.add(buster);
+            }
+        }
+        return r;
     }
 
     private MovesAndDist getMinMovesToBustGhost(Point newMyPosition, Move move, List<Ghost> ghosts) {
@@ -150,6 +170,14 @@ public class Evaluator {
                 return Integer.compare(moves, o.moves);
             }
             return Double.compare(dist, o.dist);
+        }
+
+        @Override
+        public String toString() {
+            return "MovesAndDist{" +
+                    "moves=" + moves +
+                    ", dist=" + dist +
+                    '}';
         }
     }
 }

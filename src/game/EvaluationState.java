@@ -60,4 +60,17 @@ public class EvaluationState {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "EvaluationState{" +
+                "iCanBeStunned=" + iCanBeStunned +
+                ", iHaveStun=" + iHaveStun +
+                ", isCarryingGhost=" + isCarryingGhost +
+                ", distToCheckPoint=" + distToCheckPoint +
+                ", distToBase=" + distToBase +
+                ", inReleaseRange=" + inReleaseRange +
+                ", movesAndDistToBustGhost=" + movesAndDistToBustGhost +
+                '}';
+    }
 }
