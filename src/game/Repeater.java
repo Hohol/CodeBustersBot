@@ -1,11 +1,15 @@
 package game;
 
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Repeater {
     public static void main(String[] args) {
         Interactor interactor = new Interactor();
-        Scanner scanner = new Scanner("4 23 0 8 0 926 4979 0 3 10 1 7190 5217 0 2 7 2 1807 1861 0 1 17 3 3891 7859 0 0 -1 6 8235 4040 1 2 7 7 8736 4298 1 3 11 10 1549 6587 -1 13 1 19 2389 8814 -1 15 0 \n");
-        interactor.solve(0, scanner, null);
+        Scanner scanner = new Scanner("3 17 0 9 0 7204 3960 0 0 -1 1 9287 322 0 0 -1 2 3808 834 0 0 -1 3 4350 1623 1 2 10 0 6763 5032 -1 40 0 1 10773 402 -1 3 0 3 9736 1074 -1 40 0 12 3808 834 -1 0 0 14 10142 1906 -1 3 0 \n");
+        try {
+            interactor.solve(0, scanner, null);
+        } catch (NoSuchElementException ignored) {
+        }
     }
 }

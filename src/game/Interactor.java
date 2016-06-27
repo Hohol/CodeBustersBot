@@ -57,7 +57,7 @@ public class Interactor {
                     lastStunUsed[buster.id] = round;
                     alreadyStunnedEnemies.add(move.targetId);
                 }
-                printMove(move, ghosts);
+                printMove(buster, move, ghosts);
             }
             round++;
             in.dump();
@@ -98,12 +98,12 @@ public class Interactor {
         return r;
     }
 
-    private void printMove(Move move, List<Ghost> ghosts) {
-        System.out.println(move.toInteractorString() + " " + getMessage(move, ghosts));
+    private void printMove(Buster buster, Move move, List<Ghost> ghosts) {
+        System.out.println(move.toInteractorString() + " " + getMessage(buster));
     }
 
-    private String getMessage(Move move, List<Ghost> ghosts) {
-        return "";
+    private String getMessage(Buster buster) {
+        return buster.remainingStunCooldown == 0 ? "" : ("" + buster.remainingStunCooldown);
     }
 
     private Buster buildBuster(int id, int x, int y, int state, int value, int lastStunUsed, int round, GameParameters gameParameters) {
@@ -118,6 +118,7 @@ public class Interactor {
         }
         return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown);
     }
+
     static class IntReader {
         private final Scanner in;
         List<Integer> commonInput = new ArrayList<>();
@@ -126,11 +127,13 @@ public class Interactor {
         IntReader(Scanner in) {
             this.in = in;
         }
+
         public int nextInt() {
             int r = in.nextInt();
             input.add(r);
             return r;
         }
+
         public void dump() {
             System.err.println("input dump:");
             for (int v : commonInput) {
