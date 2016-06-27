@@ -45,6 +45,7 @@ public class Interactor {
                     }
                 }
             }
+            printEnemies(enemyBusters);
             myBusters.sort(Comparator.comparing(Buster::getId));
             updateCheckpoints(myBusters, checkPoints, round, gameParameters);
             Set<Integer> alreadyStunnedEnemies = new HashSet<>();
@@ -57,6 +58,13 @@ public class Interactor {
                 printMove(move, ghosts);
             }
             round++;
+        }
+    }
+
+    private void printEnemies(List<Buster> enemies) {
+        System.err.println("Enemies:");
+        for (Buster enemy : enemies) {
+            System.err.println(enemy);
         }
     }
 

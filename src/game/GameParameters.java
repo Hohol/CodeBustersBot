@@ -10,5 +10,5 @@ public class GameParameters {
     int STUN_RANGE = 1760;
     int STUN_COOLDOWN = 20;
     int STUN_DURATION = 10;
-    int MOVE_DIST = 800;
+    int MOVE_RANGE = 800;
 }

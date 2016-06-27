@@ -33,4 +33,8 @@ public class Point {
         result = 31 * result + y;
         return result;
     }
+
+    public static Point round(double x, double y) {
+        return new Point((int)Math.round(x), (int)Math.round(y));
+    }
 }

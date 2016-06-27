@@ -21,4 +21,14 @@ public class BusterBuilder {
         isCarryingGhost = true;
         return this;
     }
+
+    public BusterBuilder stunCooldown(int cooldown) {
+        this.remainingStunCooldown = cooldown;
+        return this;
+    }
+
+    public BusterBuilder stunDuration(int duration) {
+        this.remainingStunDuration = duration;
+        return this;
+    }
 }

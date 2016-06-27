@@ -1,16 +1,21 @@
 package game;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import static game.Utils.*;
+import static java.lang.Math.*;
 
 public class BestMoveFinder {
 
     private final GameParameters gameParameters;
+    private final Evaluator evaluator;
 
     public BestMoveFinder(GameParameters gameParameters) {
         this.gameParameters = gameParameters;
+        evaluator = new Evaluator(gameParameters);
     }
 
     public Move findBestMove(Buster buster, Point myBase, List<Buster> enemies, List<Ghost> ghosts, List<CheckPoint> checkPoints, Set<Integer> alreadyStunnedEnemies) {
@@ -27,9 +32,12 @@ public class BestMoveFinder {
         if ((move = tryStunEnemy(buster, enemies, alreadyStunnedEnemies)) != null) {
             return move;
         }
-        if ((move = tryCarryGhost(buster, myBase)) != null) {
+        if ((move = tryCarryGhostAndAvoidEnemies(buster, myBase, enemies)) != null) {
             return move;
         }
+        /*if ((move = tryCarryGhost(buster, myBase)) != null) {
+            return move;
+        }*/
         if ((move = tryBustGhost(buster, ghosts, iVeSeenItAll)) != null) {
             return move;
         }
@@ -39,6 +47,54 @@ public class BestMoveFinder {
 
         Point dest = getCheckPoint(buster, checkPoints);
         return Move.move(dest);
+    }
+
+    private Move tryCarryGhostAndAvoidEnemies(Buster buster, Point myBase, List<Buster> enemies) {
+        if (!buster.isCarryingGhost) {
+            return null;
+        }
+        List<Move> possibleMoves = new ArrayList<>();
+        possibleMoves.add(Move.move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.MOVE_RANGE, gameParameters.RELEASE_RANGE)));
+        possibleMoves.add(Move.move(buster.x, buster.y));
+        for (Buster enemy : enemies) {
+            possibleMoves.add(runawayMove(buster, enemy));
+        }
+
+        Move bestMove = null;
+        EvaluationState bestEvaluation = null;
+        for (Move move : possibleMoves) {
+            Point newPosition = getNewPosition(buster, move);
+            EvaluationState evaluation = evaluator.evaluate(buster, newPosition, myBase, enemies);
+            if (evaluation.better(bestEvaluation)) {
+                bestEvaluation = evaluation;
+                bestMove = move;
+            }
+        }
+        return bestMove;
+    }
+
+    private Move runawayMove(Buster buster, Buster enemy) {
+        if (buster.x == enemy.x && buster.y == enemy.y) {
+            return Move.move(buster.x, buster.y);
+        }
+        double alpha = atan2(buster.y - enemy.y, buster.x - enemy.x);
+        double newX = buster.x + gameParameters.MOVE_RANGE * cos(alpha);
+        double newY = buster.y + gameParameters.MOVE_RANGE * sin(alpha);
+        return Move.move(Point.round(newX, newY));
+    }
+
+    private Point getNewPosition(Buster buster, Move move) {
+        if (move.type != MoveType.MOVE) {
+            return new Point(buster.x, buster.y);
+        }
+        double dist = dist(buster.x, buster.y, move.x, move.y);
+        if (dist <= gameParameters.MOVE_RANGE) {
+            return new Point(move.x, move.y);
+        }
+        double w = gameParameters.MOVE_RANGE / dist;
+        double dx = (move.x - buster.x) * w;
+        double dy = (move.y - buster.y) * w;
+        return Point.round(buster.x + dx, buster.y + dy);
     }
 
     private Move tryReleaseGhost(Buster buster, Point myBase) {
@@ -102,15 +158,6 @@ public class BestMoveFinder {
             return null;
         }
         return Move.bust(bustableGhost.id);
-    }
-
-    private Move tryCarryGhost(Buster buster, Point myBasePosition) {
-        if (!buster.isCarryingGhost) {
-            return null;
-        }
-        return Move.move(
-                moveToWithAllowedRange(buster.x, buster.y, myBasePosition.x, myBasePosition.y, gameParameters.MOVE_DIST, gameParameters.RELEASE_RANGE)
-        );
     }
 
     private Ghost pickNearestGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {

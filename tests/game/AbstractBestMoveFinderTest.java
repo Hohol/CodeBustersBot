@@ -25,7 +25,7 @@ public class AbstractBestMoveFinderTest {
         testGameParameters.STUN_RANGE = 5;
         testGameParameters.RELEASE_RANGE = 4;
         testGameParameters.MIN_BUST_RANGE = 3;
-        testGameParameters.MOVE_DIST = 2;
+        testGameParameters.MOVE_RANGE = 2;
 
         bestMoveFinder = new BestMoveFinder(testGameParameters);
         testBuilder = new TestBuilder();

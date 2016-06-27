@@ -20,4 +20,16 @@ public class Buster {
     public int getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "Buster{" +
+                "id=" + id +
+                ", x=" + x +
+                ", y=" + y +
+                ", isCarryGh=" + isCarryingGhost +
+                ", remStDur=" + remainingStunDuration +
+                ", remStCd=" + remainingStunCooldown +
+                '}';
+    }
 }
