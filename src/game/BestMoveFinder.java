@@ -1,8 +1,6 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static game.Move.*;
 import static game.Utils.*;
@@ -49,7 +47,7 @@ public class BestMoveFinder {
     private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
         List<Ghost> r = new ArrayList<>();
         for (Ghost ghost : ghosts) {
-            if (ghost.stamina < 30) {
+            if (ghost.stamina < 30) { // magic
                 r.add(ghost);
             }
         }
@@ -57,7 +55,7 @@ public class BestMoveFinder {
     }
 
     private Move trySomethingSmart(Buster buster, Point myBase, List<Buster> allies, List<Buster> enemies, List<Ghost> ghosts, Point checkPoint, Set<Integer> alreadyBusted) {
-        List<Move> possibleMoves = new ArrayList<>();
+        Set<Move> possibleMoves = new LinkedHashSet<>();
         possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.MOVE_RANGE, gameParameters.RELEASE_RANGE)));
         possibleMoves.add(move(buster.x, buster.y));
         for (Buster enemy : enemies) {
@@ -141,38 +139,6 @@ public class BestMoveFinder {
         return null;
     }
 
-    private Move tryGoToNearestGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll, Point myBase) {
-        Ghost ghost = pickNearestGhost(buster, ghosts, iVeSeenItAll);
-        if (ghost == null) {
-            return null;
-        }
-        if (dist(buster, ghost) >= gameParameters.MAX_BUST_RANGE) {
-            return move(ghost.x, ghost.y);
-        } else {
-            return move(myBase);
-        }
-    }
-
-    private Ghost pickNearestGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {
-        Ghost nearest = null;
-        double minDist = Double.POSITIVE_INFINITY;
-        for (Ghost ghost : ghosts) {
-            if (shouldSkipGhost(ghost, iVeSeenItAll)) { // magic
-                continue;
-            }
-            double dist = dist(buster, ghost);
-            if (dist < minDist) {
-                minDist = dist;
-                nearest = ghost;
-            }
-        }
-        return nearest;
-    }
-
-    private boolean shouldSkipGhost(Ghost ghost, boolean iVeSeenItAll) {
-        return ghost.stamina >= 30 && !iVeSeenItAll;
-    }
-
     private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints, Point myBase) {
         Point enemyBase = new Point(gameParameters.H - myBase.x, gameParameters.W - myBase.y);
         for (CheckPoint checkPoint : checkPoints) {
@@ -184,18 +150,4 @@ public class BestMoveFinder {
         }
         return true;
     }
-
-    private Ghost pickBustableGhost(Buster buster, List<Ghost> ghosts, boolean iVeSeenItAll) {
-        for (Ghost ghost : ghosts) {
-            if (shouldSkipGhost(ghost, iVeSeenItAll)) {
-                continue;
-            }
-            double range = dist(buster, ghost);
-            if (range >= gameParameters.MIN_BUST_RANGE && range <= gameParameters.MAX_BUST_RANGE) {
-                return ghost;
-            }
-        }
-        return null;
-    }
-
 }
