@@ -65,8 +65,12 @@ public class Interactor {
 
             Set<Integer> alreadyStunnedEnemies = new HashSet<>();
             Set<Integer> alreadyBusted = new HashSet<>();
+
+            List<Move> moves = new ArrayList<>();
             for (Buster buster : allies) {
                 Move move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
+
+                moves.add(move);
                 if (move.type == STUN) {
                     lastStunUsed[buster.id] = round;
                     alreadyStunnedEnemies.add(move.targetId);
@@ -76,9 +80,30 @@ public class Interactor {
                 }
                 printMove(buster, move);
             }
+            for (int i = 0; i < bustersPerPlayer; i++) {
+                Buster buster = allies.get(i);
+                Move move = moves.get(i);
+                if (move.type != STUN) {
+                    continue;
+                }
+                Buster target = getWithId(enemies, move.targetId);
+                if (!target.isCarryingGhost) {
+                    continue;
+                }
+                phantomGhosts.add(phantomUpdater.dropGhostFromStunnedEnemy(buster, target));
+            }
             round++;
             in.dump();
         }
+    }
+
+    private Buster getWithId(List<Buster> enemies, int targetId) {
+        for (Buster enemy : enemies) {
+            if (enemy.getId() == targetId) {
+                return enemy;
+            }
+        }
+        throw new RuntimeException();
     }
 
     private <T> void print(List<T> list, final String message) {

@@ -180,7 +180,16 @@ public class PhantomUpdaterTest {
         );
     }
 
-    // todo stunned enemy drops phantom ghost. омг и при этом они убегают хуй знает куда. возможно стоит считать что они убегают максимально далеко от меня и бросают госта там
+    @Test
+    void stunnedEnemyDropsGhost() {
+        assertEquals(
+                phantomUpdater.dropGhostFromStunnedEnemy(
+                        buster(0, 10, 0).build(),
+                        buster(0, 11, 0).carryingGhost(3).build()
+                ),
+                ghost(0, 13, 3)
+        );
+    }
 
     // --- utils
 

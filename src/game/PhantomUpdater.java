@@ -110,7 +110,7 @@ public class PhantomUpdater {
             return ghost;
         }
         Point mean = getMeanPoint(bustersWithMinDist);
-        Point p = Utils.runawayPoint(mean.x, mean.y, ghost.x, ghost.y, gameParameters.GHOST_MOVE_RANGE);
+        Point p = runawayPoint(mean.x, mean.y, ghost.x, ghost.y, gameParameters.GHOST_MOVE_RANGE);
         return new Ghost(ghost.id, p.x, p.y, ghost.stamina, ghost.bustCnt);
     }
 
@@ -142,5 +142,11 @@ public class PhantomUpdater {
             }
         }
         return r;
+    }
+
+    public Ghost dropGhostFromStunnedEnemy(Buster buster, Buster target) {
+        Point to = runawayPoint(buster.x, buster.y, target.x, target.y, gameParameters.MOVE_RANGE);
+        to = getNewPosition(target.x, target.y, to.x, to.y, gameParameters);
+        return new Ghost(target.ghostId, to.x, to.y, 0, 0);
     }
 }
