@@ -41,7 +41,7 @@ public class BestMoveFinder {
             ghosts = removeFatGhosts(ghosts);
         }
         Point checkPoint = getCheckPoint(buster, checkPoints);
-        return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted);
+        return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted, checkPoints);
     }
 
     private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
@@ -54,7 +54,16 @@ public class BestMoveFinder {
         return r;
     }
 
-    private Move trySomethingSmart(Buster buster, Point myBase, List<Buster> allies, List<Buster> enemies, List<Ghost> ghosts, Point checkPoint, Set<Integer> alreadyBusted) {
+    private Move trySomethingSmart(
+            Buster buster,
+            Point myBase,
+            List<Buster> allies,
+            List<Buster> enemies,
+            List<Ghost> ghosts,
+            Point checkPoint,
+            Set<Integer> alreadyBusted,
+            List<CheckPoint> checkPoints
+    ) {
         Set<Move> possibleMoves = new LinkedHashSet<>();
         possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.MOVE_RANGE, gameParameters.RELEASE_RANGE)));
         possibleMoves.add(move(buster.x, buster.y));
@@ -67,7 +76,9 @@ public class BestMoveFinder {
             }
             possibleMoves.add(move(ghost.x, ghost.y));
         }
-        possibleMoves.add(move(checkPoint));
+        for (CheckPoint point : checkPoints) {
+            possibleMoves.add(move(point.p));
+        }
         for (Buster enemy : enemies) {
             possibleMoves.add(move(enemy.x, enemy.y));
         }
