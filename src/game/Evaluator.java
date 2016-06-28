@@ -39,7 +39,18 @@ public class Evaluator {
         boolean inReleaseRange = distToBase <= gameParameters.RELEASE_RANGE;
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
         boolean canStunEnemyWithGhost = checkCanStunEnemyWithGhost(buster, newMyPosition, enemies);
-        return new EvaluationState(canBeStunned, iHaveStun, isCarryingGhost, distToCheckPoint, distToBase, inReleaseRange, movesToBustGhost, canStunEnemyWithGhost);
+        boolean weSeeSomeGhost = !ghosts.isEmpty();
+        return new EvaluationState(
+                canBeStunned,
+                iHaveStun,
+                isCarryingGhost,
+                distToCheckPoint,
+                distToBase,
+                inReleaseRange,
+                movesToBustGhost,
+                canStunEnemyWithGhost,
+                weSeeSomeGhost
+        );
     }
 
     private boolean checkCanStunEnemyWithGhost(Buster buster, Point newMyPosition, List<Buster> enemies) {
@@ -146,7 +157,7 @@ public class Evaluator {
         }
         double pseudoDist = getPseudoDist(newMyPosition, ghost);
         moves += (int) Math.ceil(pseudoDist / gameParameters.MOVE_RANGE);
-        double dist = dist(newMyPosition, ghost);
+        double dist = Math.ceil(dist(newMyPosition, ghost));
         return new MovesAndDist(moves, dist);
     }
 

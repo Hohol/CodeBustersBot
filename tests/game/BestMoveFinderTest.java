@@ -151,4 +151,11 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(50, 36).carryingGhost();
         checkMove(Move.move(50, 36));
     }
+
+    @Test
+    void beCloserToBaseWhenBusting() {
+        ally(0, 25);
+        ghost(0, 25, 3);
+        checkMove(move(0, 4));
+    }
 }

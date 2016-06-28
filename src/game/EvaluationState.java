@@ -9,6 +9,7 @@ public class EvaluationState {
     private final boolean inReleaseRange;
     private final Evaluator.MovesAndDist movesAndDistToBustGhost;
     private final boolean canStunEnemyWithGhost;
+    private final boolean weSeeSomeGhost;
 
     public EvaluationState(
             boolean iCanBeStunned,
@@ -18,8 +19,8 @@ public class EvaluationState {
             double distToBase,
             boolean inReleaseRange,
             Evaluator.MovesAndDist movesAndDistToBustGhost,
-            boolean canStunEnemyWithGhost
-    ) {
+            boolean canStunEnemyWithGhost,
+            boolean weSeeSomeGhost) {
         this.iCanBeStunned = iCanBeStunned;
         this.iHaveStun = iHaveStun;
         this.isCarryingGhost = isCarryingGhost;
@@ -28,6 +29,7 @@ public class EvaluationState {
         this.inReleaseRange = inReleaseRange;
         this.movesAndDistToBustGhost = movesAndDistToBustGhost;
         this.canStunEnemyWithGhost = canStunEnemyWithGhost;
+        this.weSeeSomeGhost = weSeeSomeGhost;
     }
 
     public boolean better(EvaluationState st) {
@@ -63,6 +65,14 @@ public class EvaluationState {
         int compareMovesAndDist = movesAndDistToBustGhost.compareTo(st.movesAndDistToBustGhost);
         if (compareMovesAndDist != 0) {
             return compareMovesAndDist < 0;
+        }
+        if (weSeeSomeGhost && !st.weSeeSomeGhost) {
+            throw new RuntimeException();
+        }
+        if (weSeeSomeGhost) {
+            if (distToBase != st.distToBase) {
+                return distToBase < st.distToBase;
+            }
         }
         if (distToCheckPoint != st.distToCheckPoint) {
             return distToCheckPoint < st.distToCheckPoint;
