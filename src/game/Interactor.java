@@ -23,8 +23,8 @@ public class Interactor {
         int round = 0;
         in.store();
         while (true) {
-            List<Buster> myBusters = new ArrayList<>();
-            List<Buster> enemyBusters = new ArrayList<>();
+            List<Buster> allies = new ArrayList<>();
+            List<Buster> enemies = new ArrayList<>();
             List<Ghost> ghosts = new ArrayList<>();
 
             int entities = in.nextInt(); // the number of busters and ghosts visible to you
@@ -41,20 +41,21 @@ public class Interactor {
                 } else {
                     Buster buster = buildBuster(entityId, x, y, state, value, lastStunUsed[entityId], round, gameParameters);
                     if (entityType == myTeamId) {
-                        myBusters.add(buster);
+                        allies.add(buster);
                     } else {
-                        enemyBusters.add(buster);
+                        enemies.add(buster);
                     }
                 }
             }
             printGhosts(ghosts);
-            printEnemies(enemyBusters);
-            myBusters.sort(Comparator.comparing(Buster::getId));
-            updateCheckpoints(myBusters, checkPoints, round, gameParameters);
+            printBusters(enemies, "Enemies");
+            printBusters(allies, "Allies");
+            allies.sort(Comparator.comparing(Buster::getId));
+            updateCheckpoints(allies, checkPoints, round, gameParameters);
             Set<Integer> alreadyStunnedEnemies = new HashSet<>();
             Set<Integer> alreadyBusted = new HashSet<>();
-            for (Buster buster : myBusters) {
-                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, myBusters, enemyBusters, ghosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
+            for (Buster buster : allies) {
+                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, enemies, ghosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
                 if (move.type == STUN) {
                     lastStunUsed[buster.id] = round;
                     alreadyStunnedEnemies.add(move.targetId);
@@ -75,8 +76,8 @@ public class Interactor {
         }
     }
 
-    private void printEnemies(List<Buster> enemies) {
-        System.err.println("Enemies:");
+    private void printBusters(List<Buster> enemies, final String message) {
+        System.err.println(message + ":");
         for (Buster enemy : enemies) {
             System.err.println(enemy);
         }
