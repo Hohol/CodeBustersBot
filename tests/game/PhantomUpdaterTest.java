@@ -164,8 +164,22 @@ public class PhantomUpdaterTest {
         );
     }
 
-    // todo if I bust it, remove it хотя наверно не нужно, потому что есть вижн. хотя наверно нужно, потому что я буду ошибочно предполагать что он убежит
-    // todo if it's busted, remove it
+    @Test
+    void testBusterCarriesGhost() {
+        List<Ghost> ghosts = asList();
+        List<Ghost> phantomGhosts = asList(ghost(10, 10, 0), ghost(10, 10, 1), ghost(10, 10, 2));
+        List<Buster> allies = asList(buster(0, 0, 0).carryingGhost(0).build());
+        List<Buster> enemies = asList(buster(0, 0, 1).carryingGhost(1).build());
+        List<Ghost> expected = asList(ghost(10, 10, 2));
+        checkGhosts(
+                ghosts,
+                phantomGhosts,
+                allies,
+                enemies,
+                expected
+        );
+    }
+
     // todo stunned enemy drops phantom ghost. омг и при этом они убегают хуй знает куда. возможно стоит считать что они убегают максимально далеко от меня и бросают госта там
 
     // --- utils

@@ -51,7 +51,7 @@ public class PhantomUpdater {
         }
         Point newPosition = getNewPosition(pe, Move.move(enemyBase), gameParameters);
         //noinspection ConstantConditions
-        return new Buster(pe.id, newPosition.x, newPosition.y, pe.isCarryingGhost, pe.remainingStunDuration, pe.remainingStunCooldown);
+        return new Buster(pe.id, newPosition.x, newPosition.y, pe.isCarryingGhost, pe.remainingStunDuration, pe.remainingStunCooldown, pe.ghostId);
     }
 
     private boolean containsWithId(List<Buster> busters, int id) {
@@ -74,6 +74,9 @@ public class PhantomUpdater {
             if (containsGhostWithId(ghosts, phantomGhost.id)) {
                 continue;
             }
+            if (carriesGhostWithId(allBusters, phantomGhost.id)) {
+                continue;
+            }
             Ghost newGhostState = moveGhost(phantomGhost, allBusters);
             if (weHaveVisionOverThisPlace(allies, newGhostState.x, newGhostState.y)) {
                 continue;
@@ -81,6 +84,15 @@ public class PhantomUpdater {
             r.add(newGhostState);
         }
         return r;
+    }
+
+    private boolean carriesGhostWithId(List<Buster> allBusters, int ghostId) {
+        for (Buster buster : allBusters) {
+            if (buster.ghostId == ghostId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     boolean containsGhostWithId(List<Ghost> ghosts, int id) {

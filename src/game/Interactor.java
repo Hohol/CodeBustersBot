@@ -128,12 +128,14 @@ public class Interactor {
         int remainingStunCooldown = stunDelta < gameParameters.STUN_COOLDOWN ? gameParameters.STUN_COOLDOWN - stunDelta : 0;
         int remainingStunDuration = 0;
         boolean isCarryingGhost = false;
+        int ghostId = -1;
         if (state == 1) {
             isCarryingGhost = true;
+            ghostId = value;
         } else if (state == 2) {
             remainingStunDuration = value;
         }
-        return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown);
+        return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown, ghostId);
     }
 
     static class IntReader {

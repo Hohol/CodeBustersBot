@@ -111,7 +111,7 @@ public class Evaluator {
             if (enemy.isCarryingGhost) {
                 Point p = getNewPosition(enemy, toBase, gameParameters);
                 //noinspection ConstantConditions
-                r.add(new Buster(enemy.id, p.x, p.y, enemy.isCarryingGhost, enemy.remainingStunDuration, enemy.remainingStunCooldown));
+                r.add(new Buster(enemy.id, p.x, p.y, enemy.isCarryingGhost, enemy.remainingStunDuration, enemy.remainingStunCooldown, enemy.ghostId));
             } else {
                 r.add(enemy);
             }
