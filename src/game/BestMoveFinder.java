@@ -9,10 +9,12 @@ public class BestMoveFinder {
 
     private final GameParameters gameParameters;
     private final Evaluator evaluator;
+    private final PhantomUpdater phantomUpdater;
 
     public BestMoveFinder(GameParameters gameParameters) {
         this.gameParameters = gameParameters;
         evaluator = new Evaluator(gameParameters);
+        phantomUpdater = new PhantomUpdater(gameParameters);
     }
 
     public Move findBestMove(
@@ -82,18 +84,59 @@ public class BestMoveFinder {
         for (Buster enemy : enemies) {
             possibleMoves.add(move(enemy.x, enemy.y));
         }
+        List<List<Buster>> enemiesWithGhostNextPositions = getEnemiesWithGhostNextPositions(enemies, getEnemyBase(myBase, gameParameters));
+        for (List<Buster> list : enemiesWithGhostNextPositions) {
+            for (Buster enemyPosition : list) {
+                possibleMoves.add(move(enemyPosition.x, enemyPosition.y));
+            }
+        }
 
         Move bestMove = null;
         EvaluationState bestEvaluation = null;
         for (Move move : possibleMoves) {
             Point newPosition = getNewPosition(buster, move, this.gameParameters);
-            EvaluationState evaluation = evaluator.evaluate(buster, newPosition, myBase, allies, enemies, ghosts, move, checkPoint, alreadyBusted);
+            EvaluationState evaluation = evaluator.evaluate(
+                    buster,
+                    newPosition,
+                    myBase,
+                    allies,
+                    enemies,
+                    ghosts,
+                    move,
+                    checkPoint,
+                    alreadyBusted,
+                    enemiesWithGhostNextPositions
+            );
             if (evaluation.better(bestEvaluation)) {
                 bestEvaluation = evaluation;
                 bestMove = move;
             }
         }
         return bestMove;
+    }
+
+    private List<List<Buster>> getEnemiesWithGhostNextPositions(List<Buster> enemies, Point enemyBase) {
+        List<List<Buster>> r = new ArrayList<>();
+        for (Buster enemy : enemies) {
+            if (enemy.isCarryingGhost) {
+                r.add(getNextPositionsOnWayToBase(enemy, enemyBase));
+            }
+        }
+        return r;
+    }
+
+    private List<Buster> getNextPositionsOnWayToBase(Buster enemy, Point enemyBase) {
+        List<Buster> r = new ArrayList<>();
+        boolean first = true;
+        while (enemy != null) {
+            if (!first) {
+                r.add(enemy);
+            }
+            first = false;
+            enemy = phantomUpdater.movePhantomEnemy(enemy, enemyBase);
+
+        }
+        return r;
     }
 
     private Move tryReleaseGhost(Buster buster, Point myBase) {

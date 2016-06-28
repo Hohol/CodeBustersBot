@@ -71,17 +71,23 @@ public class Utils {
     }
 
     static Point getNewPosition(Buster buster, Move move, GameParameters gameParameters) {
+        int fromX = buster.x;
+        int fromY = buster.y;
         if (move.type != MoveType.MOVE) {
-            return new Point(buster.x, buster.y);
+            return new Point(fromX, fromY);
         }
-        double dist = dist(buster.x, buster.y, move.x, move.y);
+        return getNewPosition(fromX, fromY, move.x, move.y, gameParameters);
+    }
+
+    public static Point getNewPosition(int fromX, int fromY, int toX, int toY, GameParameters gameParameters) {
+        double dist = dist(fromX, fromY, toX, toY);
         if (dist <= gameParameters.MOVE_RANGE) {
-            return new Point(move.x, move.y);
+            return new Point(toX, toY);
         }
         double w = gameParameters.MOVE_RANGE / dist;
-        double dx = (move.x - buster.x) * w;
-        double dy = (move.y - buster.y) * w;
-        return Point.round(buster.x + dx, buster.y + dy);
+        double dx = (toX - fromX) * w;
+        double dy = (toY - fromY) * w;
+        return Point.round(fromX + dx, fromY + dy);
     }
 
     static Point getEnemyBase(Point myBase, GameParameters gameParameters) {

@@ -158,4 +158,18 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ghost(0, 25, 3);
         checkMove(move(0, 4));
     }
+
+    @Test
+    void extendedChase() {
+        ally(43, 46);
+        enemy(50, 44).carryingGhost();
+        checkMove(move(50, 46));
+    }
+
+    @Test
+    void extendedChase2() {
+        ally(41, 46);
+        enemy(50, 42).carryingGhost();
+        checkMove(move(50, 44)); // it looks strange but it's correct
+    }
 }

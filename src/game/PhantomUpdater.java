@@ -42,7 +42,7 @@ public class PhantomUpdater {
         return false;
     }
 
-    private Buster movePhantomEnemy(Buster pe, Point enemyBase) {
+    public Buster movePhantomEnemy(Buster pe, Point enemyBase) {
         if (!pe.isCarryingGhost) {
             return pe;
         }
