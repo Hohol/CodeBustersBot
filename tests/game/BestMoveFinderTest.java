@@ -160,30 +160,44 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
     }
 
     @Test
-    void extendedChase() {
-        ally(43, 46);
-        enemy(50, 44).carryingGhost();
-        checkMove(move(50, 46));
+    void extendedChaseTooLate() {
+        ally(41, 46);
+        enemy(50, 42).carryingGhost();
+        checkMove(move(25, 25));
     }
 
     @Test
     void extendedChase2() {
-        ally(41, 46);
-        enemy(50, 42).carryingGhost();
-        checkMove(move(50, 44)); // it looks strange but it's correct
+        ally(41, 44);
+        enemy(50, 40).carryingGhost();
+        checkMove(move(50, 42)); // it looks strange but it's correct
     }
 
     @Test
     void considerStunCooldownWhenChasing() {
-        ally(41, 46).stunCooldown(2);
-        enemy(50, 42).carryingGhost();
-        checkMove(move(50, 44));
+        ally(41, 44).stunCooldown(2);
+        enemy(50, 40).carryingGhost();
+        checkMove(move(50, 42));
     }
 
     @Test
     void considerStunCooldownWhenChasing2() {
-        ally(41, 46).stunCooldown(3);
-        enemy(50, 42).carryingGhost();
+        ally(41, 44).stunCooldown(3);
+        enemy(50, 40).carryingGhost();
+        checkMove(move(25, 25));
+    }
+
+    @Test
+    void chaseBug() {
+        ally(0, 0);
+        enemy(50, 46).carryingGhost();
+        checkMove(move(25, 25)); // just no exception
+    }
+
+    @Test
+    void chaseBug2() {
+        ally(25, 30);
+        enemy(50, 44).carryingGhost();
         checkMove(move(25, 25));
     }
 }
