@@ -42,7 +42,7 @@ public class Evaluator {
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
         boolean canStunEnemyWithGhost = checkCanStunEnemyWithGhost(buster, newMyPosition, enemies);
         boolean weSeeSomeGhost = !ghosts.isEmpty();
-        int movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemiesWithGhostNextPositions);
+        int movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
         return new EvaluationState(
                 canBeStunned,
                 iHaveStun,
@@ -57,16 +57,20 @@ public class Evaluator {
         );
     }
 
-    private int getMovesToStunEnemyWithGhost(Point newMyPosition, List<List<Buster>> enemiesWithGhostNextPositions) {
+    private int getMovesToStunEnemyWithGhost(Point newMyPosition, List<List<Buster>> enemiesWithGhostNextPositions, int remainingStunCooldown) {
+        remainingStunCooldown--;
+        if (remainingStunCooldown < 0) {
+            remainingStunCooldown = 0;
+        }
         int r = Integer.MAX_VALUE;
         for (List<Buster> list : enemiesWithGhostNextPositions) {
-            r = min(r, getMovesToStunEnemy(newMyPosition, list));
+            r = min(r, getMovesToStunEnemy(newMyPosition, list, remainingStunCooldown));
         }
         return r;
     }
 
-    private int getMovesToStunEnemy(Point newMyPosition, List<Buster> enemyStates) {
-        for (int k = 0; k < enemyStates.size(); k++) {
+    private int getMovesToStunEnemy(Point newMyPosition, List<Buster> enemyStates, int remainingStunCooldown) {
+        for (int k = remainingStunCooldown; k < enemyStates.size(); k++) {
             Buster enemy = enemyStates.get(k);
             if (canGetInStunRangeInKMoves(newMyPosition, enemy, k)) {
                 return k;
