@@ -27,6 +27,10 @@ public class Evaluator {
         List<Buster> allBusters = new ArrayList<>(allies);
         allBusters.addAll(enemies);
         ghosts = moveGhosts(ghosts, move, allBusters, alreadyBusted);
+        enemies = moveEnemies(enemies, myBase);
+
+
+
         boolean canBeStunned = checkCanBeStunned(newMyPosition, enemies);
         boolean iHaveStun = buster.remainingStunCooldown == 0;
         boolean isCarryingGhost = checkIsCarryingGhost(buster, move, ghosts);
@@ -34,7 +38,36 @@ public class Evaluator {
         double distToBase = dist(newMyPosition, myBase);
         boolean inReleaseRange = distToBase <= gameParameters.RELEASE_RANGE;
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
-        return new EvaluationState(canBeStunned, iHaveStun, isCarryingGhost, distToCheckPoint, distToBase, inReleaseRange, movesToBustGhost);
+        boolean canStunEnemyWithGhost = checkCanStunEnemyWithGhost(buster, newMyPosition, enemies);
+        return new EvaluationState(canBeStunned, iHaveStun, isCarryingGhost, distToCheckPoint, distToBase, inReleaseRange, movesToBustGhost, canStunEnemyWithGhost);
+    }
+
+    private boolean checkCanStunEnemyWithGhost(Buster buster, Point newMyPosition, List<Buster> enemies) {
+        if (buster.remainingStunCooldown > 1) {
+            return false;
+        }
+        for (Buster enemy : enemies) {
+            if(enemy.isCarryingGhost && dist(newMyPosition, enemy) <= gameParameters.STUN_RANGE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<Buster> moveEnemies(List<Buster> enemies, Point myBase) {
+        Point enemyBase = getEnemyBase(myBase, gameParameters);
+        List<Buster> r = new ArrayList<>();
+        Move toBase = Move.move(enemyBase);
+        for (Buster enemy : enemies) {
+            if (enemy.isCarryingGhost) {
+                Point p = getNewPosition(enemy, toBase, gameParameters);
+                //noinspection ConstantConditions
+                r.add(new Buster(enemy.id, p.x, p.y, enemy.isCarryingGhost, enemy.remainingStunDuration, enemy.remainingStunCooldown));
+            } else {
+                r.add(enemy);
+            }
+        }
+        return r;
     }
 
     private List<Ghost> moveGhosts(List<Ghost> ghosts, Move move, List<Buster> allBusters, Set<Integer> alreadyBusted) {

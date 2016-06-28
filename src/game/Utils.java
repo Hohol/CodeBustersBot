@@ -29,6 +29,10 @@ public class Utils {
         return dist(p.x, p.y, g.x, g.y);
     }
 
+    static double dist(Point p, Buster b) {
+        return dist(p.x, p.y, b.x, b.y);
+    }
+
     public static long sqr(int x) {
         return x * x;
     }
@@ -64,5 +68,23 @@ public class Utils {
         double newX = x + moveRange * cos(alpha);
         double newY = y + moveRange * sin(alpha);
         return Point.round(newX, newY);
+    }
+
+    static Point getNewPosition(Buster buster, Move move, GameParameters gameParameters) {
+        if (move.type != MoveType.MOVE) {
+            return new Point(buster.x, buster.y);
+        }
+        double dist = dist(buster.x, buster.y, move.x, move.y);
+        if (dist <= gameParameters.MOVE_RANGE) {
+            return new Point(move.x, move.y);
+        }
+        double w = gameParameters.MOVE_RANGE / dist;
+        double dx = (move.x - buster.x) * w;
+        double dy = (move.y - buster.y) * w;
+        return Point.round(buster.x + dx, buster.y + dy);
+    }
+
+    static Point getEnemyBase(Point myBase, GameParameters gameParameters) {
+        return new Point(gameParameters.H - myBase.x, gameParameters.W - myBase.y);
     }
 }

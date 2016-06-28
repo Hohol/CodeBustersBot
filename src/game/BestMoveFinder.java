@@ -68,11 +68,14 @@ public class BestMoveFinder {
             possibleMoves.add(move(ghost.x, ghost.y));
         }
         possibleMoves.add(move(checkPoint));
+        for (Buster enemy : enemies) {
+            possibleMoves.add(move(enemy.x, enemy.y));
+        }
 
         Move bestMove = null;
         EvaluationState bestEvaluation = null;
         for (Move move : possibleMoves) {
-            Point newPosition = getNewPosition(buster, move);
+            Point newPosition = getNewPosition(buster, move, this.gameParameters);
             EvaluationState evaluation = evaluator.evaluate(buster, newPosition, myBase, allies, enemies, ghosts, move, checkPoint, alreadyBusted);
             if (evaluation.better(bestEvaluation)) {
                 bestEvaluation = evaluation;
@@ -80,20 +83,6 @@ public class BestMoveFinder {
             }
         }
         return bestMove;
-    }
-
-    private Point getNewPosition(Buster buster, Move move) {
-        if (move.type != MoveType.MOVE) {
-            return new Point(buster.x, buster.y);
-        }
-        double dist = dist(buster.x, buster.y, move.x, move.y);
-        if (dist <= gameParameters.MOVE_RANGE) {
-            return new Point(move.x, move.y);
-        }
-        double w = gameParameters.MOVE_RANGE / dist;
-        double dx = (move.x - buster.x) * w;
-        double dy = (move.y - buster.y) * w;
-        return Point.round(buster.x + dx, buster.y + dy);
     }
 
     private Move tryReleaseGhost(Buster buster, Point myBase) {
@@ -140,7 +129,8 @@ public class BestMoveFinder {
     }
 
     private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints, Point myBase) {
-        Point enemyBase = new Point(gameParameters.H - myBase.x, gameParameters.W - myBase.y);
+        GameParameters gameParameters = this.gameParameters;
+        Point enemyBase = getEnemyBase(myBase, gameParameters);
         for (CheckPoint checkPoint : checkPoints) {
             if (dist(checkPoint.p, myBase) <= dist(checkPoint.p, enemyBase)) {
                 if (checkPoint.lastSeen == CheckPoint.NEVER) {
@@ -150,4 +140,5 @@ public class BestMoveFinder {
         }
         return true;
     }
+
 }
