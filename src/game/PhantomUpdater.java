@@ -24,7 +24,7 @@ public class PhantomUpdater {
             if (newState == null) {
                 continue;
             }
-            if (weHaveVisionOverThisPlace(allies, newState)) {
+            if (weHaveVisionOverThisPlace(allies, newState.x, newState.y)) {
                 continue;
             }
             r.add(newState);
@@ -33,9 +33,9 @@ public class PhantomUpdater {
         return r;
     }
 
-    private boolean weHaveVisionOverThisPlace(List<Buster> allies, Buster newState) {
+    private boolean weHaveVisionOverThisPlace(List<Buster> allies, int x, int y) {
         for (Buster ally : allies) {
-            if (dist(ally, newState) <= gameParameters.FOG_RANGE) {
+            if (dist(ally.x, ally.y, x, y) <= gameParameters.FOG_RANGE) {
                 return true;
             }
         }
@@ -61,5 +61,74 @@ public class PhantomUpdater {
             }
         }
         return false;
+    }
+
+    public List<Ghost> updatePhantomGhosts(List<Ghost> ghosts, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies) {
+        ArrayList<Ghost> r = new ArrayList<>();
+        r.addAll(ghosts);
+
+        List<Buster> allBusters = new ArrayList<>(allies);
+        allBusters.addAll(enemies);
+
+        for (Ghost phantomGhost : phantomGhosts) {
+            if (containsGhostWithId(ghosts, phantomGhost.id)) {
+                continue;
+            }
+            Ghost newGhostState = moveGhost(phantomGhost, allBusters);
+            if (weHaveVisionOverThisPlace(allies, newGhostState.x, newGhostState.y)) {
+                continue;
+            }
+            r.add(newGhostState);
+        }
+        return r;
+    }
+
+    boolean containsGhostWithId(List<Ghost> ghosts, int id) {
+        for (Ghost ghost : ghosts) {
+            if (ghost.id == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Ghost moveGhost(Ghost ghost, List<Buster> allBusters) {
+        List<Buster> bustersWithMinDist = getBustersInRangeWithMinDist(ghost, allBusters);
+        if (bustersWithMinDist.isEmpty()) {
+            return ghost;
+        }
+        Point mean = getMeanPoint(bustersWithMinDist);
+        Point p = Utils.runawayPoint(mean.x, mean.y, ghost.x, ghost.y, gameParameters.GHOST_MOVE_RANGE);
+        return new Ghost(ghost.id, p.x, p.y, ghost.stamina, ghost.bustCnt);
+    }
+
+    private Point getMeanPoint(List<Buster> bustersWithMinDist) {
+        double sumX = 0;
+        double sumY = 0;
+        for (Buster buster : bustersWithMinDist) {
+            sumX += buster.x;
+            sumY += buster.y;
+        }
+        int cnt = bustersWithMinDist.size();
+        return Point.round(sumX / cnt, sumY / cnt);
+    }
+
+    private List<Buster> getBustersInRangeWithMinDist(Ghost ghost, List<Buster> allBusters) {
+        double minDist = Double.POSITIVE_INFINITY;
+        List<Buster> r = new ArrayList<>();
+        for (Buster buster : allBusters) {
+            double dist = dist(buster, ghost);
+            if (dist > gameParameters.FOG_RANGE) {
+                continue;
+            }
+            if (dist < minDist) {
+                minDist = dist;
+                r.clear();
+                r.add(buster);
+            } else if (dist == minDist) {
+                r.add(buster);
+            }
+        }
+        return r;
     }
 }

@@ -19,7 +19,7 @@ public class PhantomUpdaterTest {
 
     @Test
     void test() {
-        check(
+        checkEnemies(
                 asList(),
                 asList(buster(0, 0, 0).build()),
                 asList(buster(1, 1, 0).build()),
@@ -29,7 +29,7 @@ public class PhantomUpdaterTest {
 
     @Test
     void test2() {
-        check(
+        checkEnemies(
                 asList(),
                 asList(
                         buster(0, 0, 0).build(),
@@ -45,7 +45,7 @@ public class PhantomUpdaterTest {
 
     @Test
     void testMoveToBase() {
-        check(
+        checkEnemies(
                 asList(),
                 asList(
                         buster(50, 25, 0).carryingGhost().build()
@@ -60,7 +60,7 @@ public class PhantomUpdaterTest {
 
     @Test
     void removeIfYouHaveVision() {
-        check(
+        checkEnemies(
                 asList(buster(50, 34, 1).build()),
                 asList(
                         buster(50, 25, 0).carryingGhost().build()
@@ -73,7 +73,7 @@ public class PhantomUpdaterTest {
 
     @Test
     void removeIfReleasedGhost() {
-        check(
+        checkEnemies(
                 asList(),
                 asList(
                         buster(50, 46, 0).carryingGhost().build()
@@ -84,13 +84,108 @@ public class PhantomUpdaterTest {
         );
     }
 
-    // --- utils
-
-    private void check(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, List<Buster> expected) {
-        check(allies, phantomEnemies, enemies, expected, new Point(0, 0));
+    @Test
+    void testGhosts() {
+        List<Ghost> ghosts = asList(ghost(0, 0, 0));
+        List<Ghost> phantomGhosts = asList();
+        List<Buster> allies = asList();
+        List<Buster> enemies = asList();
+        List<Ghost> expected = asList(ghost(0, 0, 0));
+        checkGhosts(
+                ghosts,
+                phantomGhosts,
+                allies,
+                enemies,
+                expected
+        );
     }
 
-    private void check(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, List<Buster> expected, Point enemyBase) {
+    @Test
+    void testGhosts2() {
+        List<Ghost> ghosts = asList();
+        List<Ghost> phantomGhosts = asList(ghost(0, 0, 0));
+        List<Buster> allies = asList();
+        List<Buster> enemies = asList();
+        List<Ghost> expected = asList(ghost(0, 0, 0));
+        checkGhosts(
+                ghosts,
+                phantomGhosts,
+                allies,
+                enemies,
+                expected
+        );
+    }
+
+    @Test
+    void testGhosts3() {
+        List<Ghost> ghosts = asList(ghost(1, 1, 0));
+        List<Ghost> phantomGhosts = asList(ghost(0, 0, 0));
+        List<Buster> allies = asList();
+        List<Buster> enemies = asList();
+        List<Ghost> expected = asList(ghost(1, 1, 0));
+        checkGhosts(
+                ghosts,
+                phantomGhosts,
+                allies,
+                enemies,
+                expected
+        );
+    }
+
+    @Test
+    void testGhostsVision() {
+        List<Ghost> ghosts = asList();
+        List<Ghost> phantomGhosts = asList(ghost(0, 0, 0));
+        List<Buster> allies = asList(buster(0, 6, 0).build());
+        List<Buster> enemies = asList();
+        List<Ghost> expected = asList();
+        checkGhosts(
+                ghosts,
+                phantomGhosts,
+                allies,
+                enemies,
+                expected
+        );
+    }
+
+    @Test
+    void testGhostsMove() {
+        List<Ghost> ghosts = asList();
+        List<Ghost> phantomGhosts = asList(ghost(10, 10, 0));
+        List<Buster> allies = asList(buster(4, 9, 0).build());
+        List<Buster> enemies = asList(buster(4, 11, 1).build());
+        List<Ghost> expected = asList(ghost(11, 10, 0));
+        checkGhosts(
+                ghosts,
+                phantomGhosts,
+                allies,
+                enemies,
+                expected
+        );
+    }
+
+    // todo if I bust it, remove it хотя наверно не нужно, потому что есть вижн. хотя наверно нужно, потому что я буду ошибочно предполагать что он убежит
+    // todo if it's busted, remove it
+    // todo stunned enemy drops phantom ghost. омг и при этом они убегают хуй знает куда. возможно стоит считать что они убегают максимально далеко от меня и бросают госта там
+
+    // --- utils
+
+    private Ghost ghost(int x, int y, int id) {
+        return new Ghost(id, x, y, 0, 0);
+    }
+
+    private void checkGhosts(List<Ghost> ghosts, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies, List<Ghost> expected) {
+        assertEquals(
+                phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies),
+                expected
+        );
+    }
+
+    private void checkEnemies(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, List<Buster> expected) {
+        checkEnemies(allies, phantomEnemies, enemies, expected, new Point(0, 0));
+    }
+
+    private void checkEnemies(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, List<Buster> expected, Point enemyBase) {
         assertEquals(
                 phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase),
                 expected
