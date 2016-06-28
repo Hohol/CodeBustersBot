@@ -11,6 +11,7 @@ public class BusterBuilder {
     BusterBuilder(int x, int y, int id) {
         this.x = x;
         this.y = y;
+        this.id = id;
     }
 
     Buster build() {

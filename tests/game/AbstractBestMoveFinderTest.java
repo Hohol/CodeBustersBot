@@ -15,19 +15,23 @@ public class AbstractBestMoveFinderTest {
 
     @BeforeMethod
     void init() {
-        testGameParameters = new GameParameters();
-        testGameParameters.W = 50;
-        testGameParameters.H = 50;
-        testGameParameters.FOG_RANGE = 7;
-        testGameParameters.MAX_BUST_RANGE = 6;
-        testGameParameters.STUN_RANGE = 5;
-        testGameParameters.RELEASE_RANGE = 4;
-        testGameParameters.MIN_BUST_RANGE = 3;
-        testGameParameters.MOVE_RANGE = 2;
-        testGameParameters.GHOST_MOVE_RANGE = 1;
-
+        testGameParameters = createTestGameParameters();
         bestMoveFinder = new BestMoveFinder(testGameParameters);
         testBuilder = new TestBuilder();
+    }
+
+    public static GameParameters createTestGameParameters() {
+        GameParameters r = new GameParameters();
+        r.W = 50;
+        r.H = 50;
+        r.FOG_RANGE = 7;
+        r.MAX_BUST_RANGE = 6;
+        r.STUN_RANGE = 5;
+        r.RELEASE_RANGE = 4;
+        r.MIN_BUST_RANGE = 3;
+        r.MOVE_RANGE = 2;
+        r.GHOST_MOVE_RANGE = 1;
+        return r;
     }
 
     static class TestBuilder {

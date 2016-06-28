@@ -10,6 +10,9 @@ public class Interactor {
 
     public void solve(int testNumber, Scanner scanner, PrintWriter out) {
         GameParameters gameParameters = new GameParameters();
+        BestMoveFinder bestMoveFinder = new BestMoveFinder(gameParameters);
+        PhantomUpdater phantomUpdater = new PhantomUpdater(gameParameters);
+
         List<CheckPoint> checkPoints = genCheckPoints(gameParameters);
         IntReader in = new IntReader(scanner);
         int bustersPerPlayer = in.nextInt(); // the amount of busters you control
@@ -17,11 +20,12 @@ public class Interactor {
         int myTeamId = in.nextInt(); // if this is 0, your base is on the top left of the map, if it is one, on the bottom right
         Point myBasePosition = myTeamId == 0 ? new Point(0, 0) : new Point(gameParameters.H, gameParameters.W);
 
-        BestMoveFinder bestMoveFinder = new BestMoveFinder(gameParameters);
+
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
         Arrays.fill(lastStunUsed, -gameParameters.STUN_COOLDOWN - 5);
         int round = 0;
         in.store();
+        List<Buster> phantomEnemies = new ArrayList<>();
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -47,15 +51,19 @@ public class Interactor {
                     }
                 }
             }
+            allies.sort(Comparator.comparing(Buster::getId));
+            updateCheckpoints(allies, checkPoints, round, gameParameters);
+            phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, Utils.getEnemyBase(myBasePosition, gameParameters));
+
             printGhosts(ghosts);
             printBusters(enemies, "Enemies");
             printBusters(allies, "Allies");
-            allies.sort(Comparator.comparing(Buster::getId));
-            updateCheckpoints(allies, checkPoints, round, gameParameters);
+            printBusters(phantomEnemies, "Phantom enemies");
+
             Set<Integer> alreadyStunnedEnemies = new HashSet<>();
             Set<Integer> alreadyBusted = new HashSet<>();
             for (Buster buster : allies) {
-                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, enemies, ghosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
+                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, ghosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
                 if (move.type == STUN) {
                     lastStunUsed[buster.id] = round;
                     alreadyStunnedEnemies.add(move.targetId);

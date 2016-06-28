@@ -32,4 +32,29 @@ public class Buster {
                 ", remStCd=" + remainingStunCooldown +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        Buster buster = (Buster) o;
+        if (x != buster.x) return false;
+        if (y != buster.y) return false;
+        if (isCarryingGhost != buster.isCarryingGhost) return false;
+        if (id != buster.id) return false;
+        if (remainingStunDuration != buster.remainingStunDuration) return false;
+        if (remainingStunCooldown != buster.remainingStunCooldown) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = x;
+        result = 31 * result + y;
+        result = 31 * result + (isCarryingGhost ? 1 : 0);
+        result = 31 * result + id;
+        result = 31 * result + remainingStunDuration;
+        result = 31 * result + remainingStunCooldown;
+        return result;
+    }
 }
