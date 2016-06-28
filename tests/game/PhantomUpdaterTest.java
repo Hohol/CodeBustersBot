@@ -71,6 +71,19 @@ public class PhantomUpdaterTest {
         );
     }
 
+    @Test
+    void removeIfReleasedGhost() {
+        check(
+                asList(),
+                asList(
+                        buster(50, 46, 0).carryingGhost().build()
+                ),
+                asList(),
+                asList(),
+                new Point(50, 50)
+        );
+    }
+
     // --- utils
 
     private void check(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, List<Buster> expected) {

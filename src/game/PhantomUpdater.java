@@ -21,6 +21,9 @@ public class PhantomUpdater {
                 continue;
             }
             Buster newState = movePhantomEnemy(phantomEnemy, enemyBase);
+            if (newState == null) {
+                continue;
+            }
             if (weHaveVisionOverThisPlace(allies, newState)) {
                 continue;
             }
@@ -42,6 +45,9 @@ public class PhantomUpdater {
     private Buster movePhantomEnemy(Buster pe, Point enemyBase) {
         if (!pe.isCarryingGhost) {
             return pe;
+        }
+        if (dist(pe, enemyBase) <= gameParameters.RELEASE_RANGE) {
+            return null;
         }
         Point newPosition = getNewPosition(pe, Move.move(enemyBase), gameParameters);
         //noinspection ConstantConditions
