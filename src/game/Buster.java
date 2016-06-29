@@ -28,11 +28,11 @@ public class Buster {
         return "Buster{" +
                 "x=" + x +
                 ", y=" + y +
-                ", isCarryingGhost=" + isCarryingGhost +
+                ", carrGh=" + isCarryingGhost +
                 ", id=" + id +
-                ", remainingStunDuration=" + remainingStunDuration +
-                ", remainingStunCooldown=" + remainingStunCooldown +
-                ", ghostId=" + ghostId +
+                ", stDur=" + remainingStunDuration +
+                ", stCd=" + remainingStunCooldown +
+                ", ghId=" + ghostId +
                 '}';
     }
 

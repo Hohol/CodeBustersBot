@@ -7,11 +7,12 @@ import static game.MoveType.*;
 import static game.Utils.*;
 
 public class Interactor {
+    GameParameters gameParameters = new GameParameters();
 
     public void solve(int testNumber, Scanner scanner, PrintWriter out) {
-        GameParameters gameParameters = new GameParameters();
         BestMoveFinder bestMoveFinder = new BestMoveFinder(gameParameters);
         PhantomUpdater phantomUpdater = new PhantomUpdater(gameParameters);
+        Investigator investigator = new Investigator(gameParameters);
 
         List<CheckPoint> checkPoints = genCheckPoints(gameParameters);
         IntReader in = new IntReader(scanner);
@@ -27,6 +28,8 @@ public class Interactor {
         in.store();
         List<Buster> phantomEnemies = new ArrayList<>();
         List<Ghost> phantomGhosts = new ArrayList<>();
+        List<Buster> prevEnemies = new ArrayList<>();
+        List<Buster> prevAllies = new ArrayList<>();
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -52,6 +55,11 @@ public class Interactor {
                     }
                 }
             }
+            Set<Integer> whoUsedStunOnPrevMove = investigator.whoUsedStunOnPrevMove(allies, prevAllies, enemies, prevEnemies);
+            for (int enemyId : whoUsedStunOnPrevMove) {
+                lastStunUsed[enemyId] = round - 1;
+            }
+            enemies = updateStunCd(enemies, lastStunUsed, round);
             allies.sort(Comparator.comparing(Buster::getId));
             updateCheckpoints(allies, checkPoints, round, gameParameters);
 
@@ -83,7 +91,18 @@ public class Interactor {
             phantomUpdater.updateAfterMoves(phantomEnemies, phantomGhosts, allies, enemies, moves);
             round++;
             in.dump();
+            prevEnemies = enemies;
+            prevAllies = allies;
         }
+    }
+
+    private List<Buster> updateStunCd(List<Buster> enemies, int[] lastStunUsed, int round) {
+        List<Buster> r = new ArrayList<>();
+        for (Buster enemy : enemies) {
+            int cd = getCd(lastStunUsed[enemy.id], round, gameParameters);
+            r.add(new Buster(enemy.id, enemy.x, enemy.y, enemy.isCarryingGhost, enemy.remainingStunDuration, cd, enemy.ghostId));
+        }
+        return r;
     }
 
     private <T> void print(List<T> list, final String message) {
@@ -129,8 +148,7 @@ public class Interactor {
     }
 
     private Buster buildBuster(int id, int x, int y, int state, int value, int lastStunUsed, int round, GameParameters gameParameters) {
-        int stunDelta = round - lastStunUsed;
-        int remainingStunCooldown = stunDelta < gameParameters.STUN_COOLDOWN ? gameParameters.STUN_COOLDOWN - stunDelta : 0;
+        int remainingStunCooldown = getCd(lastStunUsed, round, gameParameters);
         int remainingStunDuration = 0;
         boolean isCarryingGhost = false;
         int ghostId = -1;
@@ -141,6 +159,11 @@ public class Interactor {
             remainingStunDuration = value;
         }
         return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown, ghostId);
+    }
+
+    private int getCd(int lastStunUsed, int round, GameParameters gameParameters) {
+        int stunDelta = round - lastStunUsed;
+        return stunDelta < gameParameters.STUN_COOLDOWN ? gameParameters.STUN_COOLDOWN - stunDelta : 0;
     }
 
     static class IntReader {

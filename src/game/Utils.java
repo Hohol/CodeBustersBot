@@ -1,6 +1,7 @@
 package game;
 
-import static game.Move.move;
+import java.util.List;
+
 import static java.lang.Math.*;
 
 public class Utils {
@@ -92,5 +93,14 @@ public class Utils {
 
     static Point getEnemyBase(Point myBase, GameParameters gameParameters) {
         return new Point(gameParameters.H - myBase.x, gameParameters.W - myBase.y);
+    }
+
+    static Buster getWithId(List<Buster> busters, int id) {
+        for (Buster enemy : busters) {
+            if (enemy.getId() == id) {
+                return enemy;
+            }
+        }
+        return null;
     }
 }

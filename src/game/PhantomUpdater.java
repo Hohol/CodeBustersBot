@@ -182,12 +182,4 @@ public class PhantomUpdater {
         throw new RuntimeException();
     }
 
-    private Buster getWithId(List<Buster> enemies, int targetId) {
-        for (Buster enemy : enemies) {
-            if (enemy.getId() == targetId) {
-                return enemy;
-            }
-        }
-        throw new RuntimeException();
-    }
 }

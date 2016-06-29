@@ -95,7 +95,7 @@ public class AbstractBestMoveFinderTest {
         );
     }
 
-    private List<Buster> buildBusters(List<BusterBuilder> busters) {
+    public static List<Buster> buildBusters(List<BusterBuilder> busters) {
         List<Buster> r = new ArrayList<>();
         for (BusterBuilder buster : busters) {
             r.add(buster.build());
