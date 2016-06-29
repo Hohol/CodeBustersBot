@@ -25,7 +25,6 @@ public class Interactor {
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
         Arrays.fill(lastStunUsed, -gameParameters.STUN_COOLDOWN - 5);
         int round = 0;
-        in.store();
         List<Buster> phantomEnemies = new ArrayList<>();
         List<Ghost> phantomGhosts = new ArrayList<>();
         List<Buster> prevEnemies = new ArrayList<>();
@@ -55,6 +54,7 @@ public class Interactor {
                     }
                 }
             }
+            System.err.println("Round: " + round);
             Set<Integer> whoUsedStunOnPrevMove = investigator.whoUsedStunOnPrevMove(allies, prevAllies, enemies, prevEnemies);
             for (int enemyId : whoUsedStunOnPrevMove) {
                 lastStunUsed[enemyId] = round - 1;
@@ -67,6 +67,7 @@ public class Interactor {
             phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, phantomEnemies);
 
             print(ghosts, "Ghosts");
+            print(phantomGhosts, "Phantom ghosts");
             print(enemies, "Enemies");
             print(allies, "Allies");
             print(phantomEnemies, "Phantom enemies");
@@ -89,10 +90,10 @@ public class Interactor {
                 printMove(buster, move);
             }
             phantomUpdater.updateAfterMoves(phantomEnemies, phantomGhosts, allies, enemies, moves);
-            round++;
-            in.dump();
             prevEnemies = enemies;
             prevAllies = allies;
+            in.dump();
+            round++;
         }
     }
 
@@ -168,7 +169,6 @@ public class Interactor {
 
     static class IntReader {
         private final Scanner in;
-        List<Integer> commonInput = new ArrayList<>();
         List<Integer> input = new ArrayList<>();
 
         IntReader(Scanner in) {
@@ -183,18 +183,10 @@ public class Interactor {
 
         public void dump() {
             System.err.println("input dump:");
-            for (int v : commonInput) {
-                System.err.print(v + " ");
-            }
             for (int v : input) {
                 System.err.print(v + " ");
             }
             System.err.println();
-            input.clear();
-        }
-
-        public void store() {
-            commonInput.addAll(input);
             input.clear();
         }
     }
