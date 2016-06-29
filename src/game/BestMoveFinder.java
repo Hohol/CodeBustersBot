@@ -172,6 +172,7 @@ public class BestMoveFinder {
         if (buster.remainingStunCooldown > 0) {
             return null;
         }
+        Buster bestTarget = null;
         for (Buster enemy : enemies) {
             if (enemy.remainingStunDuration > 1) {
                 continue;
@@ -180,10 +181,28 @@ public class BestMoveFinder {
                 continue;
             }
             if (dist(buster, enemy) <= gameParameters.STUN_RANGE) {
-                return stun(enemy.getId());
+                if (betterTarget(enemy, bestTarget)) {
+                    bestTarget = enemy;
+                }
             }
         }
-        return null;
+        if (bestTarget == null) {
+            return null;
+        }
+        return stun(bestTarget.id);
+    }
+
+    private boolean betterTarget(Buster newTarget, Buster oldTarget) {
+        if (oldTarget == null) {
+            return true;
+        }
+        if (newTarget.isCarryingGhost != oldTarget.isCarryingGhost) {
+            return newTarget.isCarryingGhost;
+        }
+        if (newTarget.remainingStunCooldown != oldTarget.remainingStunCooldown) {
+            return newTarget.remainingStunCooldown < oldTarget.remainingStunCooldown;
+        }
+        return false;
     }
 
     private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints, Point myBase) {
