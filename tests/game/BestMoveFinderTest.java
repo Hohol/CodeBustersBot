@@ -4,6 +4,7 @@ import org.testng.annotations.Test;
 
 import static game.Move.*;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 @Test
 public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
@@ -168,23 +169,23 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
 
     @Test
     void extendedChase2() {
-        ally(41, 44);
-        enemy(50, 40).carryingGhost();
-        checkMove(move(50, 42)); // it looks strange but it's correct
+        ally(41, 42);
+        enemy(50, 38).carryingGhost();
+        checkMove(move(50, 40)); // it looks strange but it's correct
     }
 
     @Test
     void considerStunCooldownWhenChasing() {
-        ally(41, 44).stunCooldown(2);
-        enemy(50, 40).carryingGhost();
-        checkMove(move(50, 42));
+        ally(41, 42).stunCooldown(2);
+        enemy(50, 38).carryingGhost();
+        checkMove(move(50, 40));
     }
 
     @Test
     void considerStunCooldownWhenChasing2() {
-        ally(41, 44).stunCooldown(3);
-        enemy(50, 40).carryingGhost();
-        checkMove(move(25, 25));
+        ally(41, 42).stunCooldown(3);
+        enemy(50, 38).carryingGhost();
+        checkMove(move(2, 2));
     }
 
     @Test
@@ -199,5 +200,12 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(25, 30);
         enemy(50, 44).carryingGhost();
         checkMove(move(25, 25));
+    }
+
+    @Test
+    void chaseBug3() {
+        ally(43, 44);
+        enemy(50, 42).carryingGhost();
+        checkMove(move(2, 2));
     }
 }

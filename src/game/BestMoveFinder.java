@@ -135,8 +135,10 @@ public class BestMoveFinder {
             first = false;
             enemy = phantomUpdater.movePhantomEnemy(enemy, enemyBase);
         }
-        if (!r.isEmpty()) {
-            r.remove(r.size() - 1);
+        for (int i = 0; i < 2; i++) {
+            if (!r.isEmpty()) {
+                r.remove(r.size() - 1);
+            }
         }
         return r;
     }
@@ -196,5 +198,4 @@ public class BestMoveFinder {
         }
         return true;
     }
-
 }
