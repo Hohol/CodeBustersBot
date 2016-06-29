@@ -42,7 +42,6 @@ public class Evaluator {
         double distToBase = dist(newMyPosition, myBase);
         boolean inReleaseRange = distToBase <= gameParameters.RELEASE_RANGE;
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
-        boolean canStunEnemyWithGhost = checkCanStunEnemyWithGhost(buster, newMyPosition, enemies);
         boolean weSeeSomeGhost = !ghosts.isEmpty();
         int movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
         return new EvaluationState(
@@ -53,7 +52,6 @@ public class Evaluator {
                 distToBase,
                 inReleaseRange,
                 movesToBustGhost,
-                canStunEnemyWithGhost,
                 weSeeSomeGhost,
                 movesToStunEnemyWithGhost
         );
@@ -82,23 +80,11 @@ public class Evaluator {
     }
 
     private boolean canGetInStunRangeInKMoves(Point myPosition, Buster enemy, int k) {
-        for (int i = 0; i < k; i++) {
-            myPosition = getNewPosition(myPosition.x, myPosition.y, enemy.x, enemy.y, gameParameters);
+        for (int i = 0; i <= k; i++) {
             if(dist(myPosition, enemy) <= gameParameters.STUN_RANGE) {
                 return true;
             }
-        }
-        return false;
-    }
-
-    private boolean checkCanStunEnemyWithGhost(Buster buster, Point newMyPosition, List<Buster> enemies) {
-        if (buster.remainingStunCooldown > 1) {
-            return false;
-        }
-        for (Buster enemy : enemies) {
-            if(enemy.isCarryingGhost && dist(newMyPosition, enemy) <= gameParameters.STUN_RANGE) {
-                return true;
-            }
+            myPosition = getNewPosition(myPosition.x, myPosition.y, enemy.x, enemy.y, gameParameters);
         }
         return false;
     }

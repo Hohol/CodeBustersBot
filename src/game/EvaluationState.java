@@ -8,7 +8,6 @@ public class EvaluationState {
     private final double distToBase;
     private final boolean inReleaseRange;
     private final Evaluator.MovesAndDist movesAndDistToBustGhost;
-    private final boolean canStunEnemyWithGhost;
     private final boolean weSeeSomeGhost;
     private final int movesToStunEnemyWithGhost;
 
@@ -20,8 +19,9 @@ public class EvaluationState {
             double distToBase,
             boolean inReleaseRange,
             Evaluator.MovesAndDist movesAndDistToBustGhost,
-            boolean canStunEnemyWithGhost,
-            boolean weSeeSomeGhost, int movesToStunEnemyWithGhost) {
+            boolean weSeeSomeGhost,
+            int movesToStunEnemyWithGhost
+    ) {
         this.iCanBeStunned = iCanBeStunned;
         this.iHaveStun = iHaveStun;
         this.isCarryingGhost = isCarryingGhost;
@@ -29,7 +29,6 @@ public class EvaluationState {
         this.distToBase = distToBase;
         this.inReleaseRange = inReleaseRange;
         this.movesAndDistToBustGhost = movesAndDistToBustGhost;
-        this.canStunEnemyWithGhost = canStunEnemyWithGhost;
         this.weSeeSomeGhost = weSeeSomeGhost;
         this.movesToStunEnemyWithGhost = movesToStunEnemyWithGhost;
     }
@@ -60,9 +59,6 @@ public class EvaluationState {
             }
         }
 
-        if (canStunEnemyWithGhost != st.canStunEnemyWithGhost) {
-            return canStunEnemyWithGhost;
-        }
         if (movesToStunEnemyWithGhost != st.movesToStunEnemyWithGhost) {
             return movesToStunEnemyWithGhost < st.movesToStunEnemyWithGhost;
         }
@@ -95,6 +91,8 @@ public class EvaluationState {
                 ", distToBase=" + distToBase +
                 ", inReleaseRange=" + inReleaseRange +
                 ", movesAndDistToBustGhost=" + movesAndDistToBustGhost +
+                ", weSeeSomeGhost=" + weSeeSomeGhost +
+                ", movesToStunEnemyWithGhost=" + movesToStunEnemyWithGhost +
                 '}';
     }
 }
