@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static game.MoveType.STUN;
 import static game.Utils.*;
 
 public class PhantomUpdater {
@@ -148,5 +149,45 @@ public class PhantomUpdater {
         Point to = runawayPoint(buster.x, buster.y, target.x, target.y, gameParameters.MOVE_RANGE);
         to = getNewPosition(target.x, target.y, to.x, to.y, gameParameters);
         return new Ghost(target.ghostId, to.x, to.y, 0, 0);
+    }
+
+    void updateAfterMoves(List<Buster> phantomEnemies, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies, List<Move> moves) {
+        for (int i = 0; i < allies.size(); i++) {
+            Buster buster = allies.get(i);
+            Move move = moves.get(i);
+            if (move.type != STUN) {
+                continue;
+            }
+            Buster target = getWithId(enemies, move.targetId);
+            if (!target.isCarryingGhost) {
+                continue;
+            }
+            Point newEnemyPosition = runawayPoint(buster.x, buster.y, target.x, target.y, gameParameters.MOVE_RANGE);
+            newEnemyPosition = getNewPosition(target.x, target.y, newEnemyPosition.x, newEnemyPosition.y, gameParameters);
+
+            Buster newTargetState = new Buster(target.id, newEnemyPosition.x, newEnemyPosition.y, false, gameParameters.STUN_DURATION, 0, -1);
+            update(phantomEnemies, newTargetState);
+            phantomGhosts.add(new Ghost(target.ghostId, newEnemyPosition.x, newEnemyPosition.y, 0, 0));
+        }
+    }
+
+    private void update(List<Buster> phantomEnemies, Buster newState) {
+        for (int i = 0; i < phantomEnemies.size(); i++) {
+            Buster buster = phantomEnemies.get(i);
+            if (buster.id == newState.id) {
+                phantomEnemies.set(i, newState);
+                return;
+            }
+        }
+        throw new RuntimeException();
+    }
+
+    private Buster getWithId(List<Buster> enemies, int targetId) {
+        for (Buster enemy : enemies) {
+            if (enemy.getId() == targetId) {
+                return enemy;
+            }
+        }
+        throw new RuntimeException();
     }
 }

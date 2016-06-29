@@ -80,30 +80,10 @@ public class Interactor {
                 }
                 printMove(buster, move);
             }
-            for (int i = 0; i < bustersPerPlayer; i++) {
-                Buster buster = allies.get(i);
-                Move move = moves.get(i);
-                if (move.type != STUN) {
-                    continue;
-                }
-                Buster target = getWithId(enemies, move.targetId);
-                if (!target.isCarryingGhost) {
-                    continue;
-                }
-                phantomGhosts.add(phantomUpdater.dropGhostFromStunnedEnemy(buster, target));
-            }
+            phantomUpdater.updateAfterMoves(phantomEnemies, phantomGhosts, allies, enemies, moves);
             round++;
             in.dump();
         }
-    }
-
-    private Buster getWithId(List<Buster> enemies, int targetId) {
-        for (Buster enemy : enemies) {
-            if (enemy.getId() == targetId) {
-                return enemy;
-            }
-        }
-        throw new RuntimeException();
     }
 
     private <T> void print(List<T> list, final String message) {
