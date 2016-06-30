@@ -22,8 +22,8 @@ public class AbstractBestMoveFinderTest {
 
     public static GameParameters createTestGameParameters() {
         GameParameters r = new GameParameters();
-        r.W = 50;
-        r.H = 50;
+        r.W = 51;
+        r.H = 51;
         r.FOG_RANGE = 7;
         r.MAX_BUST_RANGE = 6;
         r.STUN_RANGE = 5;

@@ -92,7 +92,11 @@ public class Utils {
     }
 
     static Point getEnemyBase(Point myBase, GameParameters gameParameters) {
-        return new Point(gameParameters.H - myBase.x, gameParameters.W - myBase.y);
+        if (myBase.x == 0) {
+            return new Point(gameParameters.H - 1, gameParameters.W - 1);
+        } else {
+            return new Point(0, 0);
+        }
     }
 
     static Buster getWithId(List<Buster> busters, int id) {

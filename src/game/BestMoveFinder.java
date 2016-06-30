@@ -209,7 +209,7 @@ public class BestMoveFinder {
         GameParameters gameParameters = this.gameParameters;
         Point enemyBase = getEnemyBase(myBase, gameParameters);
         for (CheckPoint checkPoint : checkPoints) {
-            if (dist(checkPoint.p, myBase) <= dist(checkPoint.p, enemyBase)) {
+            if (dist(checkPoint.p, myBase) <= dist(checkPoint.p, enemyBase) + 5) {
                 if (checkPoint.lastSeen == CheckPoint.NEVER) {
                     return false;
                 }

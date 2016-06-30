@@ -19,7 +19,8 @@ public class Interactor {
         int bustersPerPlayer = in.nextInt(); // the amount of busters you control
         int ghostCount = in.nextInt(); // the amount of ghosts on the map
         int myTeamId = in.nextInt(); // if this is 0, your base is on the top left of the map, if it is one, on the bottom right
-        Point myBasePosition = myTeamId == 0 ? new Point(0, 0) : new Point(gameParameters.H, gameParameters.W);
+        Point topLeftCorner = new Point(0, 0);
+        Point myBasePosition = myTeamId == 0 ? topLeftCorner : Utils.getEnemyBase(topLeftCorner, gameParameters);
         Point enemyBase = Utils.getEnemyBase(myBasePosition, gameParameters);
 
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
