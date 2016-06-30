@@ -31,6 +31,7 @@ public class Interactor {
         List<Buster> prevEnemies = new ArrayList<>();
         List<Buster> prevAllies = new ArrayList<>();
         boolean exploring = true;
+        boolean weSawCenter = false;
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -63,7 +64,10 @@ public class Interactor {
             }
             enemies = updateStunCd(enemies, lastStunUsed, round);
             allies.sort(Comparator.comparing(Buster::getId));
-            updateCheckpoints(allies, checkPoints, round, gameParameters);
+            updateCheckpoints(allies, checkPoints, round);
+            if (inVisionRange(new Point(gameParameters.H / 2, gameParameters.W / 2), allies)) {
+                weSawCenter = true;
+            }
 
             phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase);
             phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies);
@@ -83,8 +87,8 @@ public class Interactor {
             List<Move> moves = new ArrayList<>();
             for (Buster buster : allies) {
                 Move move;
-                if (exploring && !buster.isCarryingGhost && !someSmallGhostNearby(buster, ghosts)) {
-                    move = bestMoveFinder.findExploringMove(buster, allies, myBasePosition);
+                if ((exploring || !weSawCenter) && !buster.isCarryingGhost && !someSmallGhostNearby(buster, ghosts)) {
+                    move = bestMoveFinder.findExploringMove(buster, allies, myBasePosition, weSawCenter);
                 } else {
                     move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
                 }
@@ -132,14 +136,21 @@ public class Interactor {
         }
     }
 
-    private void updateCheckpoints(List<Buster> myBusters, List<CheckPoint> checkPoints, int round, GameParameters gameParameters) {
-        for (Buster myBuster : myBusters) {
-            for (CheckPoint checkPoint : checkPoints) {
-                if (dist(myBuster, checkPoint.p) <= gameParameters.FOG_RANGE) {
-                    checkPoint.lastSeen = round;
-                }
+    private void updateCheckpoints(List<Buster> myBusters, List<CheckPoint> checkPoints, int round) {
+        for (CheckPoint checkPoint : checkPoints) {
+            if (inVisionRange(checkPoint.p, myBusters)) {
+                checkPoint.lastSeen = round;
             }
         }
+    }
+
+    private boolean inVisionRange(Point p, List<Buster> myBusters) {
+        for (Buster myBuster : myBusters) {
+            if (dist(myBuster, p) <= gameParameters.FOG_RANGE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<CheckPoint> genCheckPoints(GameParameters gameParameters) {

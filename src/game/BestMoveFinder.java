@@ -256,7 +256,7 @@ public class BestMoveFinder {
         return true;
     }
 
-    public Move findExploringMove(Buster buster, List<Buster> allies, Point myBasePosition) {
+    public Move findExploringMove(Buster buster, List<Buster> allies, Point myBasePosition, boolean weSawCenter) {
         int lessXCnt = 0;
         for (Buster ally : allies) {
             if (ally.x < buster.x) {
@@ -264,6 +264,13 @@ public class BestMoveFinder {
             }
         }
         double d = gameParameters.H / (allies.size() + 1);
-        return move((int) (d * (lessXCnt + 1)), gameParameters.W / 2);
+        int x = (int) (d * (lessXCnt + 1));
+        int y = gameParameters.W / 2;
+
+        if (!weSawCenter && buster.y == y) {
+            x = gameParameters.H / 2;
+        }
+
+        return move(x, y);
     }
 }
