@@ -83,7 +83,7 @@ public class Interactor {
             List<Move> moves = new ArrayList<>();
             for (Buster buster : allies) {
                 Move move;
-                if (exploring) {
+                if (exploring && !buster.isCarryingGhost && !someSmallGhostNearby(buster, ghosts)) {
                     move = bestMoveFinder.findExploringMove(buster, allies, myBasePosition);
                 } else {
                     move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
@@ -105,6 +105,15 @@ public class Interactor {
             in.dump();
             round++;
         }
+    }
+
+    private boolean someSmallGhostNearby(Buster buster, List<Ghost> ghosts) {
+        for (Ghost ghost : ghosts) {
+            if (ghost.stamina <= 3 && dist(buster, ghost) <= gameParameters.FOG_RANGE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<Buster> updateStunCd(List<Buster> enemies, int[] lastStunUsed, int round) {
