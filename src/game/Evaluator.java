@@ -26,13 +26,12 @@ public class Evaluator {
             Move move,
             Point checkPoint,
             Set<Integer> alreadyBusted,
-            List<List<Buster>> enemiesWithGhostNextPositions
-    ) {
+            List<List<Buster>> enemiesWithGhostNextPositions,
+            List<Buster> alliesWhoNeedEscort) {
         List<Buster> allBusters = new ArrayList<>(allies);
         allBusters.addAll(enemies);
         ghosts = moveGhosts(ghosts, move, allBusters, alreadyBusted);
         enemies = moveEnemies(enemies, myBase);
-
 
 
         boolean canBeStunned = checkCanBeStunned(newMyPosition, enemies);
@@ -44,6 +43,7 @@ public class Evaluator {
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
         boolean weSeeSomeGhost = !ghosts.isEmpty();
         int movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
+        double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort);
         return new EvaluationState(
                 canBeStunned,
                 iHaveStun,
@@ -53,8 +53,20 @@ public class Evaluator {
                 inReleaseRange,
                 movesToBustGhost,
                 weSeeSomeGhost,
-                movesToStunEnemyWithGhost
+                movesToStunEnemyWithGhost,
+                distToAllyWhoNeedsEscort
         );
+    }
+
+    private double getDistToAllyWhoNeedsEscort(Buster buster, Point newMyPosition, List<Buster> alliesWhoNeedEscort) {
+        if (getWithId(alliesWhoNeedEscort, buster.id) != null) {
+            return 0;
+        }
+        double r = Double.POSITIVE_INFINITY;
+        for (Buster ally : alliesWhoNeedEscort) {
+            r = min(r, dist(newMyPosition, ally));
+        }
+        return r;
     }
 
     private int getMovesToStunEnemyWithGhost(Point newMyPosition, List<List<Buster>> enemiesWithGhostNextPositions, int remainingStunCooldown) {
@@ -81,7 +93,7 @@ public class Evaluator {
 
     private boolean canGetInStunRangeInKMoves(Point myPosition, Buster enemy, int k) {
         for (int i = 0; i <= k; i++) {
-            if(dist(myPosition, enemy) <= gameParameters.STUN_RANGE) {
+            if (dist(myPosition, enemy) <= gameParameters.STUN_RANGE) {
                 return true;
             }
             myPosition = getNewPosition(myPosition.x, myPosition.y, enemy.x, enemy.y, gameParameters.MOVE_RANGE, gameParameters);

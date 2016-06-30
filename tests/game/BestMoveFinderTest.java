@@ -4,7 +4,6 @@ import org.testng.annotations.Test;
 
 import static game.Move.*;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 
 @Test
 public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
@@ -238,5 +237,13 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(0, 10);
         enemy(0, 11).stunCooldown(19);
         checkMove(move(25, 25));
+    }
+
+    @Test
+    void testEscortSimple() {
+        ally(0, 10);
+        ally(0, 20).carryingGhost();
+        enemy(1, 20);
+        checkMove(move(0, 20));
     }
 }

@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 import java.util.*;
 
+import static game.Utils.*;
 import static org.testng.Assert.assertEquals;
 
 @Test
@@ -77,22 +78,30 @@ public class AbstractBestMoveFinderTest {
         testBuilder.alreadyBusted.add(ghostId);
     }
 
-    protected void checkMove(Move move) {
-        assertEquals(
-                bestMoveFinder.findBestMove(
-                        testBuilder.allies.get(0).build(),
-                        testBuilder.myBase,
-                        buildBusters(testBuilder.allies),
-                        buildBusters(testBuilder.enemies),
-                        testBuilder.ghosts,
-                        Collections.singletonList(
-                                new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2))
-                        ),
-                        Collections.emptySet(),
-                        testBuilder.alreadyBusted
+    protected void checkMove(Move expected) {
+        Buster buster = testBuilder.allies.get(0).build();
+        Move actual = bestMoveFinder.findBestMove(
+                buster,
+                testBuilder.myBase,
+                buildBusters(testBuilder.allies),
+                buildBusters(testBuilder.enemies),
+                testBuilder.ghosts,
+                Collections.singletonList(
+                        new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2))
                 ),
-                move
+                Collections.emptySet(),
+                testBuilder.alreadyBusted
         );
+        expected = simplify(buster, expected);
+        actual = simplify(buster, actual);
+        assertEquals(actual, expected);
+    }
+
+    private Move simplify(Buster buster, Move move) {
+        if (move.type != MoveType.MOVE) {
+            return move;
+        }
+        return Move.move(getNewPosition(buster, move, testGameParameters));
     }
 
     public static List<Buster> buildBusters(List<BusterBuilder> busters) {

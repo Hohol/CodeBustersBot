@@ -90,6 +90,10 @@ public class BestMoveFinder {
                 possibleMoves.add(move(enemyPosition.x, enemyPosition.y));
             }
         }
+        List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies);
+        for (Buster ally : alliesWhoNeedEscort) {
+            possibleMoves.add(move(ally.x, ally.y));
+        }
 
         Move bestMove = null;
         EvaluationState bestEvaluation = null;
@@ -105,7 +109,8 @@ public class BestMoveFinder {
                     move,
                     checkPoint,
                     alreadyBusted,
-                    enemiesWithGhostNextPositions
+                    enemiesWithGhostNextPositions,
+                    alliesWhoNeedEscort
             );
             if (evaluation.better(bestEvaluation)) {
                 bestEvaluation = evaluation;
@@ -113,6 +118,28 @@ public class BestMoveFinder {
             }
         }
         return bestMove;
+    }
+
+    private List<Buster> getAlliesWhoNeedEscort(List<Buster> allies, List<Buster> enemies) {
+        List<Buster> r = new ArrayList<>();
+        for (Buster ally : allies) {
+            if (needsEscort(ally, enemies)) {
+                r.add(ally);
+            }
+        }
+        return r;
+    }
+
+    private boolean needsEscort(Buster ally, List<Buster> enemies) {
+        if (!ally.isCarryingGhost) {
+            return false;
+        }
+        for (Buster enemy : enemies) {
+            if (dist(enemy, ally) <= gameParameters.STUN_RANGE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<List<Buster>> getEnemiesWithGhostNextPositions(List<Buster> enemies, Point enemyBase) {

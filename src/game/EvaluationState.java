@@ -10,6 +10,7 @@ public class EvaluationState {
     private final Evaluator.MovesAndDist movesAndDistToBustGhost;
     private final boolean weSeeSomeGhost;
     private final int movesToStunEnemyWithGhost;
+    private final double distToAllyWhoNeedsEscort;
 
     public EvaluationState(
             boolean iCanBeStunned,
@@ -20,7 +21,8 @@ public class EvaluationState {
             boolean inReleaseRange,
             Evaluator.MovesAndDist movesAndDistToBustGhost,
             boolean weSeeSomeGhost,
-            int movesToStunEnemyWithGhost
+            int movesToStunEnemyWithGhost,
+            double distToAllyWhoNeedsEscort
     ) {
         this.iCanBeStunned = iCanBeStunned;
         this.iHaveStun = iHaveStun;
@@ -31,6 +33,7 @@ public class EvaluationState {
         this.movesAndDistToBustGhost = movesAndDistToBustGhost;
         this.weSeeSomeGhost = weSeeSomeGhost;
         this.movesToStunEnemyWithGhost = movesToStunEnemyWithGhost;
+        this.distToAllyWhoNeedsEscort = distToAllyWhoNeedsEscort;
     }
 
     public boolean better(EvaluationState st) {
@@ -61,6 +64,9 @@ public class EvaluationState {
 
         if (movesToStunEnemyWithGhost != st.movesToStunEnemyWithGhost) {
             return movesToStunEnemyWithGhost < st.movesToStunEnemyWithGhost;
+        }
+        if (distToAllyWhoNeedsEscort != st.distToAllyWhoNeedsEscort) {
+            return distToAllyWhoNeedsEscort < st.distToAllyWhoNeedsEscort;
         }
 
         int compareMovesAndDist = movesAndDistToBustGhost.compareTo(st.movesAndDistToBustGhost);

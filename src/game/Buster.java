@@ -1,10 +1,10 @@
 package game;
 
 public class Buster {
+    public final int id;
     public final int x;
     public final int y;
     public final boolean isCarryingGhost;
-    public final int id;
     public final int remainingStunDuration;
     public final int remainingStunCooldown;
     public final int ghostId;
@@ -26,10 +26,10 @@ public class Buster {
     @Override
     public String toString() {
         return "Buster{" +
-                "x=" + x +
+                "id=" + id +
+                ", x=" + x +
                 ", y=" + y +
                 ", carrGh=" + isCarryingGhost +
-                ", id=" + id +
                 ", stDur=" + remainingStunDuration +
                 ", stCd=" + remainingStunCooldown +
                 ", ghId=" + ghostId +
