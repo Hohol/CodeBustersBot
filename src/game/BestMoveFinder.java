@@ -217,4 +217,15 @@ public class BestMoveFinder {
         }
         return true;
     }
+
+    public Move findExploringMove(Buster buster, List<Buster> allies, Point myBasePosition) {
+        int lessXCnt = 0;
+        for (Buster ally : allies) {
+            if (ally.x < buster.x) {
+                lessXCnt++;
+            }
+        }
+        double d = gameParameters.H / (allies.size() + 1);
+        return move((int) (d * (lessXCnt + 1)), gameParameters.W / 2);
+    }
 }

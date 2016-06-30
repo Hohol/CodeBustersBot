@@ -30,6 +30,7 @@ public class Interactor {
         List<Ghost> phantomGhosts = new ArrayList<>();
         List<Buster> prevEnemies = new ArrayList<>();
         List<Buster> prevAllies = new ArrayList<>();
+        boolean exploring = true;
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -73,12 +74,20 @@ public class Interactor {
             print(allies, "Allies");
             print(phantomEnemies, "Phantom enemies");
 
+            if (!enemies.isEmpty() || round >= 8) {
+                exploring = false;
+            }
             Set<Integer> alreadyStunnedEnemies = new HashSet<>();
             Set<Integer> alreadyBusted = new HashSet<>();
 
             List<Move> moves = new ArrayList<>();
             for (Buster buster : allies) {
-                Move move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
+                Move move;
+                if (exploring) {
+                    move = bestMoveFinder.findExploringMove(buster, allies, myBasePosition);
+                } else {
+                    move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
+                }
 
                 moves.add(move);
                 if (move.type == STUN) {
