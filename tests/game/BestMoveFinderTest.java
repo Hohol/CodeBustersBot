@@ -232,4 +232,11 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ghost(0, 25, 3);
         checkMove(move(0, 3));
     }
+
+    @Test
+    void dontStunTooEarly() {
+        ally(0, 10);
+        enemy(0, 11).stunCooldown(19);
+        checkMove(move(25, 25));
+    }
 }

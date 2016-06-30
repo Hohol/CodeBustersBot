@@ -174,22 +174,33 @@ public class BestMoveFinder {
         }
         Buster bestTarget = null;
         for (Buster enemy : enemies) {
-            if (enemy.remainingStunDuration > 1) {
+            if (shouldNotUseStun(buster, enemy, alreadyStunnedEnemies)) {
                 continue;
             }
-            if (alreadyStunnedEnemies.contains(enemy.id)) {
-                continue;
-            }
-            if (dist(buster, enemy) <= gameParameters.STUN_RANGE) {
-                if (betterTarget(enemy, bestTarget)) {
-                    bestTarget = enemy;
-                }
+            if (betterTarget(enemy, bestTarget)) {
+                bestTarget = enemy;
             }
         }
         if (bestTarget == null) {
             return null;
         }
         return stun(bestTarget.id);
+    }
+
+    private boolean shouldNotUseStun(Buster buster, Buster enemy, Set<Integer> alreadyStunnedEnemies) {
+        if (alreadyStunnedEnemies.contains(enemy.id)) {
+            return true;
+        }
+        if (dist(buster, enemy) > gameParameters.STUN_RANGE) {
+            return true;
+        }
+        if (enemy.remainingStunDuration > 1) {
+            return true;
+        }
+        if (!enemy.isCarryingGhost && enemy.remainingStunCooldown > 1 && dist(buster, enemy) <= gameParameters.MOVE_RANGE + gameParameters.STUN_RANGE) {
+            return true;
+        }
+        return false;
     }
 
     private boolean betterTarget(Buster newTarget, Buster oldTarget) {
