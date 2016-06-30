@@ -43,7 +43,7 @@ public class Evaluator {
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
         boolean weSeeSomeGhost = !ghosts.isEmpty();
         int movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
-        double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort);
+        double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase);
         return new EvaluationState(
                 canBeStunned,
                 iHaveStun,
@@ -58,13 +58,18 @@ public class Evaluator {
         );
     }
 
-    private double getDistToAllyWhoNeedsEscort(Buster buster, Point newMyPosition, List<Buster> alliesWhoNeedEscort) {
+    private double getDistToAllyWhoNeedsEscort(Buster buster, Point newMyPosition, List<Buster> alliesWhoNeedEscort, Point myBase) {
         if (getWithId(alliesWhoNeedEscort, buster.id) != null) {
             return 0;
         }
         double r = Double.POSITIVE_INFINITY;
-        for (Buster ally : alliesWhoNeedEscort) {
-            r = min(r, dist(newMyPosition, ally));
+        for (Buster courier : alliesWhoNeedEscort) {
+            Point p = positionAfterMovingToBase(courier, myBase, gameParameters);
+            double dist = dist(newMyPosition, p);
+            if (dist < gameParameters.MIN_BUST_RANGE) {
+                dist += 100500;
+            }
+            r = min(r, dist);
         }
         return r;
     }

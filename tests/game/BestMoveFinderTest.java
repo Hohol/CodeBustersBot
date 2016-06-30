@@ -10,10 +10,10 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
 
     @Test
     void testMoveWithAllowedRange() {
-        assertEquals(Utils.moveToWithAllowedRange(0, 0, 0, 0, 10, 5), new Point(0, 0));
-        assertEquals(Utils.moveToWithAllowedRange(1, 0, 0, 0, 10, 5), new Point(1, 0));
-        assertEquals(Utils.moveToWithAllowedRange(10, 0, 0, 0, 10, 5), new Point(5, 0));
-        assertEquals(Utils.moveToWithAllowedRange(1, 1, 2, 2, 1, 1), new Point(2, 2));
+        assertEquals(Utils.moveToWithAllowedRange(0, 0, 0, 0, 5), new Point(0, 0));
+        assertEquals(Utils.moveToWithAllowedRange(1, 0, 0, 0, 5), new Point(1, 0));
+        assertEquals(Utils.moveToWithAllowedRange(10, 0, 0, 0, 5), new Point(5, 0));
+        assertEquals(Utils.moveToWithAllowedRange(1, 1, 2, 2, 1), new Point(2, 2));
     }
 
     @Test
@@ -245,5 +245,13 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(0, 20).carryingGhost();
         enemy(1, 20);
         checkMove(move(0, 20));
+    }
+
+    @Test
+    void dontStayTooCloseToCourier() {
+        ally(4, 8);
+        ally(0, 10).carryingGhost();
+        enemy(0, 15);
+        checkMove(move(3, 8));
     }
 }

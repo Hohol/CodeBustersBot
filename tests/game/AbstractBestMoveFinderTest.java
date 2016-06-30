@@ -12,7 +12,7 @@ import static org.testng.Assert.assertEquals;
 public class AbstractBestMoveFinderTest {
     protected BestMoveFinder bestMoveFinder;
     protected GameParameters testGameParameters;
-    TestBuilder testBuilder;
+    private TestBuilder testBuilder;
 
     @BeforeMethod
     void init() {

@@ -38,7 +38,7 @@ public class Utils {
         return x * x;
     }
 
-    public static Point moveToWithAllowedRange(int fromX, int fromY, int toX, int toY, int moveDist, int minRange) {
+    public static Point moveToWithAllowedRange(int fromX, int fromY, int toX, int toY, int minRange) {
         double dist = dist(fromX, fromY, toX, toY);
         if (dist < minRange) {
             return new Point(fromX, fromY);
@@ -51,6 +51,29 @@ public class Utils {
         //noinspection SuspiciousNameCombination
         int ry = roundTo(fromY + dy, toY);
         return new Point(rx, ry);
+    }
+
+    public static Point moveToBeOutsideRange(int fromX, int fromY, int toX, int toY, int minRange) {
+        double dist = dist(fromX, fromY, toX, toY);
+        if (dist < minRange) {
+            return new Point(fromX, fromY);
+        }
+        double needDist = dist - minRange;
+        double w = needDist / dist;
+        double dx = (toX - fromX) * w;
+        double dy = (toY - fromY) * w;
+        int rx = roundAway(fromX + dx, toX);
+        //noinspection SuspiciousNameCombination
+        int ry = roundAway(fromY + dy, toY);
+        return new Point(rx, ry);
+    }
+
+    private static int roundAway(double x, int toX) {
+        if (toX < x) {
+            return (int) Math.ceil(x);
+        } else {
+            return (int) Math.floor(x);
+        }
     }
 
     private static int roundTo(double x, int toX) {
@@ -124,5 +147,11 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    static Point positionAfterMovingToBase(Buster courier, Point myBase, GameParameters gameParameters) {
+        Point p = moveToWithAllowedRange(courier.x, courier.y, myBase.x, myBase.y, gameParameters.RELEASE_RANGE);
+        p = getNewPosition(courier.x, courier.y, p.x, p.y, gameParameters.MOVE_RANGE, gameParameters);
+        return p;
     }
 }

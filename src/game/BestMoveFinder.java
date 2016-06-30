@@ -67,7 +67,7 @@ public class BestMoveFinder {
             List<CheckPoint> checkPoints
     ) {
         Set<Move> possibleMoves = new LinkedHashSet<>();
-        possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.MOVE_RANGE, gameParameters.RELEASE_RANGE)));
+        possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.RELEASE_RANGE)));
         possibleMoves.add(move(buster.x, buster.y));
         for (Buster enemy : enemies) {
             possibleMoves.add(move(runawayPoint(enemy.x, enemy.y, buster.x, buster.y, gameParameters.MOVE_RANGE)));
@@ -93,6 +93,9 @@ public class BestMoveFinder {
         List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies);
         for (Buster ally : alliesWhoNeedEscort) {
             possibleMoves.add(move(ally.x, ally.y));
+            Point nextPosition = positionAfterMovingToBase(ally, myBase, gameParameters);
+            possibleMoves.add(move(nextPosition));
+            possibleMoves.add(move(moveToBeOutsideRange(buster.x, buster.y, nextPosition.x, nextPosition.y, gameParameters.MIN_BUST_RANGE)));
         }
 
         Move bestMove = null;
