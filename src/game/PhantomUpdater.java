@@ -112,6 +112,7 @@ public class PhantomUpdater {
         }
         Point mean = getMeanPoint(bustersWithMinDist);
         Point p = runawayPoint(mean.x, mean.y, ghost.x, ghost.y, gameParameters.GHOST_MOVE_RANGE);
+        p = getNewPosition(ghost.x, ghost.y, p.x, p.y, gameParameters.GHOST_MOVE_RANGE, gameParameters);
         return new Ghost(ghost.id, p.x, p.y, ghost.stamina, ghost.bustCnt);
     }
 
@@ -147,7 +148,7 @@ public class PhantomUpdater {
 
     public Ghost dropGhostFromStunnedEnemy(Buster buster, Buster target) {
         Point to = runawayPoint(buster.x, buster.y, target.x, target.y, gameParameters.MOVE_RANGE);
-        to = getNewPosition(target.x, target.y, to.x, to.y, gameParameters);
+        to = getNewPosition(target.x, target.y, to.x, to.y, gameParameters.MOVE_RANGE, gameParameters);
         return new Ghost(target.ghostId, to.x, to.y, 0, 0);
     }
 
@@ -159,11 +160,12 @@ public class PhantomUpdater {
                 continue;
             }
             Buster target = getWithId(enemies, move.targetId);
+            //noinspection ConstantConditions
             if (!target.isCarryingGhost) {
                 continue;
             }
             Point newEnemyPosition = runawayPoint(buster.x, buster.y, target.x, target.y, gameParameters.MOVE_RANGE);
-            newEnemyPosition = getNewPosition(target.x, target.y, newEnemyPosition.x, newEnemyPosition.y, gameParameters);
+            newEnemyPosition = getNewPosition(target.x, target.y, newEnemyPosition.x, newEnemyPosition.y, gameParameters.MOVE_RANGE, gameParameters);
 
             Buster newTargetState = new Buster(target.id, newEnemyPosition.x, newEnemyPosition.y, false, gameParameters.STUN_DURATION, 0, -1);
             update(phantomEnemies, newTargetState);

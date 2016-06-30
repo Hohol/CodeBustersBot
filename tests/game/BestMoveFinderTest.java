@@ -224,4 +224,12 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(0, 12);
         checkMove(stun(2));
     }
+
+    @Test
+    void ghostCantMoveThroughWall() {
+        testGameParameters.MOVE_RANGE = 3;
+        ally(2, 25);
+        ghost(0, 25, 3);
+        checkMove(move(0, 3));
+    }
 }

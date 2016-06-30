@@ -77,18 +77,36 @@ public class Utils {
         if (move.type != MoveType.MOVE) {
             return new Point(fromX, fromY);
         }
-        return getNewPosition(fromX, fromY, move.x, move.y, gameParameters);
+        return getNewPosition(fromX, fromY, move.x, move.y, gameParameters.MOVE_RANGE, gameParameters);
     }
 
-    public static Point getNewPosition(int fromX, int fromY, int toX, int toY, GameParameters gameParameters) {
+    public static Point getNewPosition(int fromX, int fromY, int toX, int toY, int moveRange, GameParameters gameParameters) {
+        int newX;
+        int newY;
         double dist = dist(fromX, fromY, toX, toY);
-        if (dist <= gameParameters.MOVE_RANGE) {
-            return new Point(toX, toY);
+        if (dist <= moveRange) {
+            newX = toX;
+            newY = toY;
+        } else {
+            double w = moveRange / dist;
+            double dx = (toX - fromX) * w;
+            double dy = (toY - fromY) * w;
+            newX = (int) round(fromX + dx);
+            newY = (int) round(fromY + dy);
         }
-        double w = gameParameters.MOVE_RANGE / dist;
-        double dx = (toX - fromX) * w;
-        double dy = (toY - fromY) * w;
-        return Point.round(fromX + dx, fromY + dy);
+        if (newX < 0) {
+            newX = 0;
+        }
+        if (newY < 0) {
+            newY = 0;
+        }
+        if (newX >= gameParameters.H) {
+            newX = gameParameters.H - 1;
+        }
+        if (newY >= gameParameters.W) {
+            newY = gameParameters.W - 1;
+        }
+        return new Point(newX, newY);
     }
 
     static Point getEnemyBase(Point myBase, GameParameters gameParameters) {

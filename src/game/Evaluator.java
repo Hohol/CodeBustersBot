@@ -84,7 +84,7 @@ public class Evaluator {
             if(dist(myPosition, enemy) <= gameParameters.STUN_RANGE) {
                 return true;
             }
-            myPosition = getNewPosition(myPosition.x, myPosition.y, enemy.x, enemy.y, gameParameters);
+            myPosition = getNewPosition(myPosition.x, myPosition.y, enemy.x, enemy.y, gameParameters.MOVE_RANGE, gameParameters);
         }
         return false;
     }
