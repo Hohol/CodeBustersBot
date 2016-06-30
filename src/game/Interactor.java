@@ -66,7 +66,7 @@ public class Interactor {
             updateCheckpoints(allies, checkPoints, round, gameParameters);
 
             phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase);
-            phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, phantomEnemies);
+            phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies);
 
             print(ghosts, "Ghosts");
             print(phantomGhosts, "Phantom ghosts");
