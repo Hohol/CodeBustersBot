@@ -27,7 +27,9 @@ public class Evaluator {
             Point checkPoint,
             Set<Integer> alreadyBusted,
             List<List<Buster>> enemiesWithGhostNextPositions,
-            List<Buster> alliesWhoNeedEscort) {
+            List<Buster> alliesWhoNeedEscort,
+            boolean someOfUsCanCatchEnemyWithGhost
+    ) {
         List<Buster> allBusters = new ArrayList<>(allies);
         allBusters.addAll(enemies);
         ghosts = moveGhosts(ghosts, move, allBusters, alreadyBusted);
@@ -44,6 +46,7 @@ public class Evaluator {
         boolean weSeeSomeGhost = !ghosts.isEmpty();
         MovesAndDist movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemies, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
         double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase);
+        double minDistToEnemyWithGhost = getMinDistToEnemyWithGhost(newMyPosition, enemies);
         return new EvaluationState(
                 canBeStunned,
                 iHaveStun,
@@ -54,8 +57,21 @@ public class Evaluator {
                 movesToBustGhost,
                 weSeeSomeGhost,
                 movesToStunEnemyWithGhost,
-                distToAllyWhoNeedsEscort
+                distToAllyWhoNeedsEscort,
+                someOfUsCanCatchEnemyWithGhost,
+                minDistToEnemyWithGhost
         );
+    }
+
+    private double getMinDistToEnemyWithGhost(Point newMyPosition, List<Buster> enemies) {
+        double r = Double.POSITIVE_INFINITY;
+        for (Buster enemy : enemies) {
+            if (!enemy.isCarryingGhost) {
+                continue;
+            }
+            r = min(r, dist(newMyPosition, enemy));
+        }
+        return r;
     }
 
     private double getDistToAllyWhoNeedsEscort(Buster buster, Point newMyPosition, List<Buster> alliesWhoNeedEscort, Point myBase) {

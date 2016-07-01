@@ -90,6 +90,7 @@ public class BestMoveFinder {
                 possibleMoves.add(move(enemyPosition.x, enemyPosition.y));
             }
         }
+        boolean someOfUsCanCatchSomeEnemyWithGhost = checkSomeOfUsCanCatchEnemyWithGhost(allies, enemies, enemiesWithGhostNextPositions);
         List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies);
         for (Buster ally : alliesWhoNeedEscort) {
             possibleMoves.add(move(ally.x, ally.y));
@@ -113,7 +114,8 @@ public class BestMoveFinder {
                     checkPoint,
                     alreadyBusted,
                     enemiesWithGhostNextPositions,
-                    alliesWhoNeedEscort
+                    alliesWhoNeedEscort,
+                    someOfUsCanCatchSomeEnemyWithGhost
             );
             if (evaluation.better(bestEvaluation)) {
                 bestEvaluation = evaluation;
@@ -121,6 +123,41 @@ public class BestMoveFinder {
             }
         }
         return bestMove;
+    }
+
+    private boolean checkSomeOfUsCanCatchEnemyWithGhost(List<Buster> allies, List<Buster> enemies, List<List<Buster>> enemiesWithGhostNextPositions) {
+        for (Buster enemy : enemies) {
+            if (!enemy.isCarryingGhost) {
+                continue;
+            }
+            for (Buster ally : allies) {
+                if (ally.hasStun() && dist(ally, enemy) <= gameParameters.STUN_RANGE) {
+                    return true;
+                }
+            }
+        }
+        for (List<Buster> enemiesWithGhostNextPosition : enemiesWithGhostNextPositions) {
+            if (enemiesWithGhostNextPosition.isEmpty()) {
+                continue;
+            }
+            Buster lastPosition = enemiesWithGhostNextPosition.get(enemiesWithGhostNextPosition.size() - 1);
+            if (someoneCanCatch(allies, lastPosition, enemiesWithGhostNextPosition.size())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean someoneCanCatch(List<Buster> allies, Buster lastPosition, int afterTicks) {
+        for (Buster ally : allies) {
+            double dist = dist(ally, lastPosition);
+            dist -= gameParameters.STUN_RANGE;
+            double movesNeeded = (int) Math.ceil(dist / gameParameters.MOVE_RANGE);
+            if (movesNeeded <= afterTicks && ally.remainingStunCooldown <= afterTicks) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<Buster> getAlliesWhoNeedEscort(List<Buster> allies, List<Buster> enemies) {

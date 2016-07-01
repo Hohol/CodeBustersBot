@@ -269,4 +269,69 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(0, 12);
         checkMove(stun(1));
     }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHim() {
+        ally(50, 0);
+        ally(50, 31);
+        enemy(50, 36).carryingGhost();
+        checkMove(Move.move(50, 36));
+    }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHim2() {
+        ally(50, 0);
+        ally(43, 32);
+        enemy(50, 30).carryingGhost();
+        checkMove(Move.move(50, 30));
+    }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHim3() {
+        ally(50, 0);
+        ally(43, 42);
+        enemy(50, 40).carryingGhost();
+        checkMove(Move.move(50, 40));
+    }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHim4() {
+        ally(50, 0);
+        ally(42, 42);
+        enemy(50, 40).carryingGhost();
+        checkMove(Move.move(25, 25));
+    }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHim5() {
+        ally(50, 0);
+        ally(43, 42).stunCooldown(1);
+        enemy(50, 40).carryingGhost();
+        checkMove(Move.move(50, 40));
+    }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHim6() {
+        ally(50, 0);
+        ally(43, 42).stunCooldown(2);
+        enemy(50, 40).carryingGhost();
+        checkMove(Move.move(25, 25));
+    }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHim7() {
+        ally(50, 0);
+        ally(50, 25).stunCooldown(2);
+        enemy(50, 30).carryingGhost();
+        checkMove(Move.move(50, 30));
+    }
+
+    @Test
+    void chaseEnemyIfSomeAllyCanCatchHimPriority() {
+        ally(50, 0);
+        ally(50, 31);
+        enemy(50, 36).carryingGhost();
+        ghost(10, 10, 3);
+        checkMove(Move.move(50, 36));
+    }
 }
