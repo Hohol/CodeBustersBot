@@ -25,6 +25,10 @@ public class Buster {
         return id;
     }
 
+    public boolean hasStun() {
+        return remainingStunCooldown == 0;
+    }
+
     @Override
     public String toString() {
         return "Buster{" +

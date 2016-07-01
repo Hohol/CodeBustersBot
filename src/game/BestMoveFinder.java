@@ -240,6 +240,9 @@ public class BestMoveFinder {
         if (newTarget.isCarryingGhost != oldTarget.isCarryingGhost) {
             return newTarget.isCarryingGhost;
         }
+        if (newTarget.hasStun() != oldTarget.hasStun()) {
+            return !newTarget.hasStun();
+        }
         if (newTarget.remainingStunCooldown != oldTarget.remainingStunCooldown) {
             return newTarget.remainingStunCooldown < oldTarget.remainingStunCooldown;
         }
