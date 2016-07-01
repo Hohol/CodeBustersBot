@@ -38,7 +38,7 @@ public class BestMoveFinder {
         if ((move = tryStunEnemy(buster, enemies, alreadyStunnedEnemies)) != null) {
             return move;
         }
-        boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
+        boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints);
         if (!iVeSeenItAll) {
             ghosts = removeFatGhosts(ghosts);
         }
@@ -249,14 +249,10 @@ public class BestMoveFinder {
         return false;
     }
 
-    private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints, Point myBase) {
-        GameParameters gameParameters = this.gameParameters;
-        Point enemyBase = getEnemyBase(myBase, gameParameters);
+    private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints) {
         for (CheckPoint checkPoint : checkPoints) {
-            if (dist(checkPoint.p, myBase) <= dist(checkPoint.p, enemyBase) + 5) {
-                if (checkPoint.lastSeen == CheckPoint.NEVER) {
-                    return false;
-                }
+            if (checkPoint.lastSeen == CheckPoint.NEVER) {
+                return false;
             }
         }
         return true;

@@ -87,7 +87,7 @@ public class AbstractBestMoveFinderTest {
                 buildBusters(testBuilder.enemies),
                 testBuilder.ghosts,
                 Collections.singletonList(
-                        new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2))
+                        new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2), CheckPoint.NEVER)
                 ),
                 Collections.emptySet(),
                 testBuilder.alreadyBusted

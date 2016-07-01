@@ -5,9 +5,9 @@ public class CheckPoint {
     public final Point p;
     public int lastSeen;
 
-    public CheckPoint(Point p) {
+    public CheckPoint(Point p, int lastSeen) {
         this.p = p;
-        lastSeen = NEVER;
+        this.lastSeen = lastSeen;
     }
 
     @Override

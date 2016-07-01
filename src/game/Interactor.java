@@ -14,14 +14,14 @@ public class Interactor {
         PhantomUpdater phantomUpdater = new PhantomUpdater(gameParameters);
         Investigator investigator = new Investigator(gameParameters);
 
-        List<CheckPoint> checkPoints = genCheckPoints(gameParameters);
         IntReader in = new IntReader(scanner);
         int bustersPerPlayer = in.nextInt(); // the amount of busters you control
         int ghostCount = in.nextInt(); // the amount of ghosts on the map
         int myTeamId = in.nextInt(); // if this is 0, your base is on the top left of the map, if it is one, on the bottom right
         Point topLeftCorner = new Point(0, 0);
-        Point myBasePosition = myTeamId == 0 ? topLeftCorner : Utils.getEnemyBase(topLeftCorner, gameParameters);
-        Point enemyBase = Utils.getEnemyBase(myBasePosition, gameParameters);
+        Point myBase = myTeamId == 0 ? topLeftCorner : Utils.getEnemyBase(topLeftCorner, gameParameters);
+        Point enemyBase = Utils.getEnemyBase(myBase, gameParameters);
+        List<CheckPoint> checkPoints = genCheckPoints(gameParameters, myBase, enemyBase);
 
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
         Arrays.fill(lastStunUsed, -gameParameters.STUN_COOLDOWN - 5);
@@ -88,9 +88,9 @@ public class Interactor {
             for (Buster buster : allies) {
                 Move move;
                 if ((exploring || !weSawCenter) && !buster.isCarryingGhost && !someSmallGhostNearby(buster, ghosts)) {
-                    move = bestMoveFinder.findExploringMove(buster, allies, myBasePosition, weSawCenter);
+                    move = bestMoveFinder.findExploringMove(buster, allies, myBase, weSawCenter);
                 } else {
-                    move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
+                    move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
                 }
 
                 moves.add(move);
@@ -153,7 +153,7 @@ public class Interactor {
         return false;
     }
 
-    private List<CheckPoint> genCheckPoints(GameParameters gameParameters) {
+    private List<CheckPoint> genCheckPoints(GameParameters gameParameters, Point myBase, Point enemyBase) {
         List<CheckPoint> r = new ArrayList<>();
         int n = 4;
         int m = 6;
@@ -164,7 +164,14 @@ public class Interactor {
                 }
                 int x = (int) Math.round((double) i * gameParameters.H / (n - 1));
                 int y = (int) Math.round((double) j * gameParameters.W / (m - 1));
-                r.add(new CheckPoint(new Point(x, y)));
+                Point p = new Point(x, y);
+                CheckPoint cp;
+                if (dist(p, myBase) <= dist(p, enemyBase) + 5) {
+                    cp = new CheckPoint(p, CheckPoint.NEVER);
+                } else {
+                    cp = new CheckPoint(p, 0);
+                }
+                r.add(cp);
             }
         }
         return r;
