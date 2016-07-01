@@ -42,7 +42,7 @@ public class Evaluator {
         boolean inReleaseRange = distToBase <= gameParameters.RELEASE_RANGE;
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
         boolean weSeeSomeGhost = !ghosts.isEmpty();
-        int movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
+        MovesAndDist movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemies, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
         double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase);
         return new EvaluationState(
                 canBeStunned,
@@ -74,14 +74,25 @@ public class Evaluator {
         return r;
     }
 
-    private int getMovesToStunEnemyWithGhost(Point newMyPosition, List<List<Buster>> enemiesWithGhostNextPositions, int remainingStunCooldown) {
+    private MovesAndDist getMovesToStunEnemyWithGhost(Point newMyPosition, List<Buster> enemies, List<List<Buster>> enemiesWithGhostNextPositions, int remainingStunCooldown) {
         remainingStunCooldown--;
         if (remainingStunCooldown < 0) {
             remainingStunCooldown = 0;
         }
-        int r = Integer.MAX_VALUE;
+        MovesAndDist r = MovesAndDist.INFINITY;
         for (List<Buster> list : enemiesWithGhostNextPositions) {
-            r = min(r, getMovesToStunEnemy(newMyPosition, list, remainingStunCooldown));
+            if (list.isEmpty()) {
+                continue;
+            }
+            Buster currentState = getWithId(enemies, list.get(0).id);
+            int movesToStunEnemy = getMovesToStunEnemy(newMyPosition, list, remainingStunCooldown);
+            if (movesToStunEnemy == MovesAndDist.INFINITY.moves) {
+                continue;
+            }
+            MovesAndDist m = new MovesAndDist(movesToStunEnemy, dist(newMyPosition, currentState));
+            if (m.compareTo(r) < 0) {
+                r = m;
+            }
         }
         return r;
     }
@@ -144,7 +155,7 @@ public class Evaluator {
     }
 
     private MovesAndDist getMinMovesToBustGhost(Point newMyPosition, Move move, List<Ghost> ghosts) {
-        MovesAndDist r = new MovesAndDist(99999, 0);
+        MovesAndDist r = MovesAndDist.INFINITY;
         for (Ghost ghost : ghosts) {
             MovesAndDist movesAndDist = getMinMovesToBustGhost(newMyPosition, move, ghost);
             if (movesAndDist.compareTo(r) < 0) {
@@ -205,6 +216,7 @@ public class Evaluator {
     }
 
     static class MovesAndDist implements Comparable<MovesAndDist> {
+        public static final MovesAndDist INFINITY = new MovesAndDist(Integer.MAX_VALUE, Double.POSITIVE_INFINITY);
         private final int moves;
         private final double dist;
 

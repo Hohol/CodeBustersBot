@@ -9,7 +9,7 @@ public class EvaluationState {
     private final boolean inReleaseRange;
     private final Evaluator.MovesAndDist movesAndDistToBustGhost;
     private final boolean weSeeSomeGhost;
-    private final int movesToStunEnemyWithGhost;
+    private final Evaluator.MovesAndDist movesToStunEnemyWithGhost;
     private final double distToAllyWhoNeedsEscort;
 
     public EvaluationState(
@@ -21,7 +21,7 @@ public class EvaluationState {
             boolean inReleaseRange,
             Evaluator.MovesAndDist movesAndDistToBustGhost,
             boolean weSeeSomeGhost,
-            int movesToStunEnemyWithGhost,
+            Evaluator.MovesAndDist movesToStunEnemyWithGhost,
             double distToAllyWhoNeedsEscort
     ) {
         this.iCanBeStunned = iCanBeStunned;
@@ -62,8 +62,9 @@ public class EvaluationState {
             }
         }
 
-        if (movesToStunEnemyWithGhost != st.movesToStunEnemyWithGhost) {
-            return movesToStunEnemyWithGhost < st.movesToStunEnemyWithGhost;
+        int compareMovesToStun = movesToStunEnemyWithGhost.compareTo(st.movesToStunEnemyWithGhost);
+        if (compareMovesToStun != 0) {
+            return compareMovesToStun < 0;
         }
         if (distToAllyWhoNeedsEscort != st.distToAllyWhoNeedsEscort) {
             return distToAllyWhoNeedsEscort < st.distToAllyWhoNeedsEscort;
