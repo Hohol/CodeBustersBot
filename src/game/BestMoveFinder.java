@@ -176,6 +176,9 @@ public class BestMoveFinder {
         }
         Point newCourierPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
         for (Buster enemy : enemies) {
+            if (enemy.remainingStunDuration > 0) {
+                continue;
+            }
             if (dist(enemy, ally) <= gameParameters.STUN_RANGE) {
                 return true;
             }
