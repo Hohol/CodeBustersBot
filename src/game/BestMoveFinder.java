@@ -91,7 +91,7 @@ public class BestMoveFinder {
             }
         }
         boolean someOfUsCanCatchSomeEnemyWithGhost = checkSomeOfUsCanCatchEnemyWithGhost(allies, enemies, enemiesWithGhostNextPositions);
-        List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies);
+        List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies, myBase);
         for (Buster ally : alliesWhoNeedEscort) {
             possibleMoves.add(move(ally.x, ally.y));
             Point nextPosition = positionAfterMovingToBase(ally, myBase, gameParameters);
@@ -160,22 +160,25 @@ public class BestMoveFinder {
         return false;
     }
 
-    private List<Buster> getAlliesWhoNeedEscort(List<Buster> allies, List<Buster> enemies) {
+    private List<Buster> getAlliesWhoNeedEscort(List<Buster> allies, List<Buster> enemies, Point myBase) {
         List<Buster> r = new ArrayList<>();
         for (Buster ally : allies) {
-            if (needsEscort(ally, enemies)) {
+            if (needsEscort(ally, enemies, myBase)) {
                 r.add(ally);
             }
         }
         return r;
-    }
+}
 
-    private boolean needsEscort(Buster ally, List<Buster> enemies) {
+    private boolean needsEscort(Buster ally, List<Buster> enemies, Point myBase) {
         if (!ally.isCarryingGhost) {
             return false;
         }
         for (Buster enemy : enemies) {
             if (dist(enemy, ally) <= gameParameters.STUN_RANGE) {
+                return true;
+            }
+            if (dist(enemy, myBase) <= dist(ally, myBase)) {
                 return true;
             }
         }
