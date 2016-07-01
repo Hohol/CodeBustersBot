@@ -85,6 +85,16 @@ public class PhantomUpdaterTest {
     }
 
     @Test
+    void removeIfExpired() {
+        checkEnemies(
+                asList(),
+                asList(buster(0, 0, 0).lastSeen(-25).build()),
+                asList(),
+                asList()
+        );
+    }
+
+    @Test
     void testGhosts() {
         List<Ghost> ghosts = asList(ghost(0, 0, 0));
         List<Ghost> phantomGhosts = asList();
@@ -210,7 +220,7 @@ public class PhantomUpdaterTest {
 
     private void checkEnemies(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, List<Buster> expected, Point enemyBase) {
         assertEquals(
-                phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase),
+                phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase, 0),
                 expected
         );
     }

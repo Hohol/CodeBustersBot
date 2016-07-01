@@ -8,8 +8,9 @@ public class Buster {
     public final int remainingStunDuration;
     public final int remainingStunCooldown;
     public final int ghostId;
+    public final int lastSeen;
 
-    public Buster(int id, int x, int y, boolean isCarryingGhost, int remainingStunDuration, int remainingStunCooldown, int ghostId) {
+    public Buster(int id, int x, int y, boolean isCarryingGhost, int remainingStunDuration, int remainingStunCooldown, int ghostId, int lastSeen) {
         this.x = x;
         this.y = y;
         this.isCarryingGhost = isCarryingGhost;
@@ -17,6 +18,7 @@ public class Buster {
         this.remainingStunDuration = remainingStunDuration;
         this.remainingStunCooldown = remainingStunCooldown;
         this.ghostId = ghostId;
+        this.lastSeen = lastSeen;
     }
 
     public int getId() {

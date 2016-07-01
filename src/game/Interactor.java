@@ -69,7 +69,7 @@ public class Interactor {
                 weSawCenter = true;
             }
 
-            phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase);
+            phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase, round);
             phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies);
 
             print(ghosts, "Ghosts");
@@ -124,7 +124,7 @@ public class Interactor {
         List<Buster> r = new ArrayList<>();
         for (Buster enemy : enemies) {
             int cd = getCd(lastStunUsed[enemy.id], round, gameParameters);
-            r.add(new Buster(enemy.id, enemy.x, enemy.y, enemy.isCarryingGhost, enemy.remainingStunDuration, cd, enemy.ghostId));
+            r.add(new Buster(enemy.id, enemy.x, enemy.y, enemy.isCarryingGhost, enemy.remainingStunDuration, cd, enemy.ghostId, enemy.lastSeen));
         }
         return r;
     }
@@ -189,7 +189,7 @@ public class Interactor {
         } else if (state == 2) {
             remainingStunDuration = value;
         }
-        return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown, ghostId);
+        return new Buster(id, x, y, isCarryingGhost, remainingStunDuration, remainingStunCooldown, ghostId, round);
     }
 
     private int getCd(int lastStunUsed, int round, GameParameters gameParameters) {

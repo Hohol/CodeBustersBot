@@ -14,11 +14,14 @@ public class PhantomUpdater {
         this.gameParameters = gameParameters;
     }
 
-    public List<Buster> updatePhantomEnemies(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, Point enemyBase) {
+    public List<Buster> updatePhantomEnemies(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, Point enemyBase, int round) {
         List<Buster> r = new ArrayList<>();
         r.addAll(enemies);
         for (Buster phantomEnemy : phantomEnemies) {
             if (containsWithId(enemies, phantomEnemy.id)) {
+                continue;
+            }
+            if (!phantomEnemy.isCarryingGhost && round - phantomEnemy.lastSeen >= 20) {
                 continue;
             }
             Buster newState = movePhantomEnemy(phantomEnemy, enemyBase);
@@ -52,7 +55,7 @@ public class PhantomUpdater {
         }
         Point newPosition = getNewPosition(pe, Move.move(enemyBase), gameParameters);
         //noinspection ConstantConditions
-        return new Buster(pe.id, newPosition.x, newPosition.y, pe.isCarryingGhost, pe.remainingStunDuration, pe.remainingStunCooldown, pe.ghostId);
+        return new Buster(pe.id, newPosition.x, newPosition.y, pe.isCarryingGhost, pe.remainingStunDuration, pe.remainingStunCooldown, pe.ghostId, pe.lastSeen);
     }
 
     private boolean containsWithId(List<Buster> busters, int id) {
@@ -167,7 +170,7 @@ public class PhantomUpdater {
             Point newEnemyPosition = runawayPoint(buster.x, buster.y, target.x, target.y, gameParameters.MOVE_RANGE);
             newEnemyPosition = getNewPosition(target.x, target.y, newEnemyPosition.x, newEnemyPosition.y, gameParameters.MOVE_RANGE, gameParameters);
 
-            Buster newTargetState = new Buster(target.id, newEnemyPosition.x, newEnemyPosition.y, false, gameParameters.STUN_DURATION, 0, -1);
+            Buster newTargetState = new Buster(target.id, newEnemyPosition.x, newEnemyPosition.y, false, gameParameters.STUN_DURATION, 0, -1, target.lastSeen);
             update(phantomEnemies, newTargetState);
             phantomGhosts.add(new Ghost(target.ghostId, newEnemyPosition.x, newEnemyPosition.y, 0, 0));
         }
