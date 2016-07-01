@@ -267,9 +267,6 @@ public class BestMoveFinder {
         if (enemy.remainingStunDuration > 1) {
             return true;
         }
-        if (!enemy.isCarryingGhost && enemy.remainingStunCooldown > 1 && dist(buster, enemy) <= gameParameters.MOVE_RANGE + gameParameters.STUN_RANGE) {
-            return true;
-        }
         return false;
     }
 

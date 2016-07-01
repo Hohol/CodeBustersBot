@@ -220,7 +220,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
     void preferStunEnemyWithLessStunCooldown() {
         ally(0, 10);
         enemy(0, 11).stunCooldown(10);
-        enemy(0, 12);
+        enemy(0, 12).stunCooldown(9);
         checkMove(stun(2));
     }
 
@@ -230,13 +230,6 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(2, 25);
         ghost(0, 25, 3);
         checkMove(move(0, 3));
-    }
-
-    @Test
-    void dontStunTooEarly() {
-        ally(0, 10);
-        enemy(0, 11).stunCooldown(19);
-        checkMove(move(25, 25));
     }
 
     @Test
