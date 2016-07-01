@@ -80,7 +80,7 @@ public class Evaluator {
         }
         double r = Double.POSITIVE_INFINITY;
         for (Buster courier : alliesWhoNeedEscort) {
-            Point p = positionAfterMovingToBase(courier, myBase, gameParameters);
+            Point p = getPositionAfterMovingToBase(courier, myBase, gameParameters);
             double dist = dist(newMyPosition, p);
             if (dist < gameParameters.MIN_BUST_RANGE) {
                 dist += 100500;

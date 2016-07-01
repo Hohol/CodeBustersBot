@@ -94,7 +94,7 @@ public class BestMoveFinder {
         List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies, myBase);
         for (Buster ally : alliesWhoNeedEscort) {
             possibleMoves.add(move(ally.x, ally.y));
-            Point nextPosition = positionAfterMovingToBase(ally, myBase, gameParameters);
+            Point nextPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
             possibleMoves.add(move(nextPosition));
             possibleMoves.add(move(moveToBeOutsideRange(buster.x, buster.y, nextPosition.x, nextPosition.y, gameParameters.MIN_BUST_RANGE)));
         }
@@ -174,11 +174,15 @@ public class BestMoveFinder {
         if (!ally.isCarryingGhost) {
             return false;
         }
+        Point newCourierPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
         for (Buster enemy : enemies) {
             if (dist(enemy, ally) <= gameParameters.STUN_RANGE) {
                 return true;
             }
             if (dist(enemy, myBase) <= dist(ally, myBase)) {
+                return true;
+            }
+            if (dist(enemy, newCourierPosition) <= gameParameters.MOVE_RANGE + gameParameters.STUN_RANGE) {
                 return true;
             }
         }
