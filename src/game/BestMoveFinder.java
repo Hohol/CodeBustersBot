@@ -72,8 +72,10 @@ public class BestMoveFinder {
         for (Buster enemy : enemies) {
             possibleMoves.add(move(runawayPoint(enemy.x, enemy.y, buster.x, buster.y, gameParameters.MOVE_RANGE)));
         }
+        Set<Integer> forbiddenGhosts = getForbiddenGhosts(ghosts, allies, enemies);
         for (Ghost ghost : ghosts) {
-            if (dist(buster, ghost) >= gameParameters.MIN_BUST_RANGE && dist(buster, ghost) <= gameParameters.MAX_BUST_RANGE) {
+            if (dist(buster, ghost) >= gameParameters.MIN_BUST_RANGE && dist(buster, ghost) <= gameParameters.MAX_BUST_RANGE
+                    && !forbiddenGhosts.contains(ghost.id)) {
                 possibleMoves.add(bust(ghost.id));
             }
             possibleMoves.add(move(ghost.x, ghost.y));
@@ -126,6 +128,32 @@ public class BestMoveFinder {
         return bestMove;
     }
 
+    private Set<Integer> getForbiddenGhosts(List<Ghost> ghosts, List<Buster> allies, List<Buster> enemies) {
+        Set<Integer> r = new HashSet<>();
+        for (Ghost ghost : ghosts) {
+            int alliesInBustRange = getInBustRange(ghost, allies);
+            int enemiesInBustRange = getInBustRange(ghost, enemies);
+            if (enemiesInBustRange > alliesInBustRange) {
+                r.add(ghost.id);
+            }
+        }
+        return r;
+    }
+
+    private int getInBustRange(Ghost ghost, List<Buster> busters) {
+        int cnt = 0;
+        for (Buster buster : busters) {
+            if (buster.remainingStunDuration > 0) {
+                continue;
+            }
+            double dist = dist(buster, ghost);
+            if (dist >= gameParameters.MIN_BUST_RANGE && dist <= gameParameters.MAX_BUST_RANGE) {
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+
     private boolean checkSomeOfUsCanCatchEnemyWithGhost(List<Buster> allies, List<Buster> enemies, List<List<Buster>> enemiesWithGhostNextPositions) {
         for (Buster enemy : enemies) {
             if (!enemy.isCarryingGhost) {
@@ -170,7 +198,7 @@ public class BestMoveFinder {
             }
         }
         return r;
-}
+    }
 
     private boolean needsEscort(Buster ally, List<Buster> enemies, Point myBase) {
         if (!ally.isCarryingGhost) {
