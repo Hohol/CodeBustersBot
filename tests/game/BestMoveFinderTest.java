@@ -430,4 +430,12 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(50, 10).carryingGhost().stunCooldown(1);
         checkMove(move(50, 9));
     }
+
+    @Test
+    void preferStunEnemyWhoCanTakeMyGhost() {
+        ally(0, 10).carryingGhost();
+        enemy(0, 12);
+        enemy(0, 13);
+        checkMove(stun(2));
+    }
 }

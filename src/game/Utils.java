@@ -161,4 +161,8 @@ public class Utils {
         }
         return Move.move(getNewPosition(buster, move, gameParameters));
     }
+
+    static boolean inBustRange(double dist, GameParameters gameParameters) {
+        return dist >= gameParameters.MIN_BUST_RANGE && dist <= gameParameters.MAX_BUST_RANGE;
+    }
 }

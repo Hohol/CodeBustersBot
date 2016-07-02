@@ -161,7 +161,7 @@ public class BestMoveFinder {
                 continue;
             }
             double dist = dist(enemy, ghost);
-            if (enemy.remainingStunDuration < movesToBust && dist >= gameParameters.MIN_BUST_RANGE && dist <= gameParameters.MAX_BUST_RANGE) {
+            if (enemy.remainingStunDuration < movesToBust && inBustRange(dist, gameParameters)) {
                 cnt++;
             }
         }
@@ -179,7 +179,7 @@ public class BestMoveFinder {
                 continue;
             }
             double dist = dist(buster, ghost);
-            if (dist >= gameParameters.MIN_BUST_RANGE && dist <= gameParameters.MAX_BUST_RANGE) {
+            if (inBustRange(dist, gameParameters)) {
                 cnt++;
             }
         }
@@ -316,7 +316,7 @@ public class BestMoveFinder {
             if (shouldNotUseStun(buster, enemy, alreadyStunnedEnemies)) {
                 continue;
             }
-            if (betterTarget(enemy, bestTarget)) {
+            if (betterTarget(buster, enemy, bestTarget)) {
                 bestTarget = enemy;
             }
         }
@@ -339,7 +339,7 @@ public class BestMoveFinder {
         return false;
     }
 
-    private boolean betterTarget(Buster newTarget, Buster oldTarget) {
+    private boolean betterTarget(Buster me, Buster newTarget, Buster oldTarget) {
         if (oldTarget == null) {
             return true;
         }
@@ -351,6 +351,11 @@ public class BestMoveFinder {
         }
         if (newTarget.remainingStunCooldown != oldTarget.remainingStunCooldown) {
             return newTarget.remainingStunCooldown < oldTarget.remainingStunCooldown;
+        }
+        boolean newCanTakeGhost = inBustRange(dist(newTarget, me), gameParameters);
+        boolean oldCanTakeGhost = inBustRange(dist(oldTarget, me), gameParameters);
+        if (newCanTakeGhost != oldCanTakeGhost) {
+            return newCanTakeGhost;
         }
         return false;
     }
