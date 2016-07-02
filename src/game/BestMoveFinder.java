@@ -27,7 +27,8 @@ public class BestMoveFinder {
             List<CheckPoint> checkPoints,
             Set<Integer> alreadyStunnedEnemies,
             Set<Integer> alreadyBusted,
-            boolean halfGhostsCollected
+            boolean halfGhostsCollected,
+            int[] prevMoveBustCnt
     ) {
         if (buster.remainingStunDuration > 0) {
             return release();
@@ -45,7 +46,7 @@ public class BestMoveFinder {
             ghosts = removeFatGhosts(ghosts);
         }
         Point checkPoint = getCheckPoint(buster, checkPoints);
-        return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted, checkPoints, halfGhostsCollected);
+        return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted, checkPoints, halfGhostsCollected, prevMoveBustCnt);
     }
 
     private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
@@ -67,7 +68,8 @@ public class BestMoveFinder {
             Point checkPoint,
             Set<Integer> alreadyBusted,
             List<CheckPoint> checkPoints,
-            boolean halfGhostsCollected
+            boolean halfGhostsCollected,
+            int[] prevMoveBustCnt
     ) {
         Set<Move> possibleMoves = new LinkedHashSet<>();
         possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.RELEASE_RANGE)));
@@ -76,7 +78,7 @@ public class BestMoveFinder {
             possibleMoves.add(move(runawayPoint(enemy.x, enemy.y, buster.x, buster.y, gameParameters.MOVE_RANGE)));
             possibleMoves.add(move(moveToBeOutsideRange(buster.x, buster.y, enemy.x, enemy.y, gameParameters.MIN_BUST_RANGE)));
         }
-        Set<Integer> forbiddenGhosts = getForbiddenGhosts(ghosts, allies, enemies);
+        Set<Integer> forbiddenGhosts = getForbiddenGhosts(ghosts, allies, enemies, prevMoveBustCnt);
         for (Ghost ghost : ghosts) {
             if (dist(buster, ghost) >= gameParameters.MIN_BUST_RANGE && dist(buster, ghost) <= gameParameters.MAX_BUST_RANGE
                     && !forbiddenGhosts.contains(ghost.id)) {
@@ -136,7 +138,7 @@ public class BestMoveFinder {
         return bestMove;
     }
 
-    private Set<Integer> getForbiddenGhosts(List<Ghost> ghosts, List<Buster> allies, List<Buster> enemies) {
+    private Set<Integer> getForbiddenGhosts(List<Ghost> ghosts, List<Buster> allies, List<Buster> enemies, int[] prevMoveBustCnt) {
         Set<Integer> r = new HashSet<>();
         for (Ghost ghost : ghosts) {
             int alliesInBustRange = getInBustRange(ghost, allies);
@@ -148,7 +150,7 @@ public class BestMoveFinder {
             int movesToBust = divUp(ghost.stamina, alliesInBustRange);
             enemiesInBustRange += getStunnedButDangerousEnemies(ghost, enemies, movesToBust);
 
-            enemiesInBustRange = max(enemiesInBustRange, ghost.bustCnt - alliesInBustRange);
+            enemiesInBustRange = max(enemiesInBustRange, ghost.bustCnt - prevMoveBustCnt[ghost.id]);
             if (enemiesInBustRange > alliesInBustRange) {
                 r.add(ghost.id);
             }

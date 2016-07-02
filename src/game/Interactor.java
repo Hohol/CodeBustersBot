@@ -34,6 +34,7 @@ public class Interactor {
         boolean weSawCenter = false;
         int ghostsCollectedCnt = 0;
         boolean halfGhostsCollected = false;
+        int[] prevMoveBustCnt = new int[ghostCnt];
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -92,7 +93,7 @@ public class Interactor {
                 if ((exploring || !weSawCenter) && !buster.isCarryingGhost && !someSmallGhostNearby(buster, ghosts)) {
                     move = bestMoveFinder.findExploringMove(buster, allies, myBase, weSawCenter);
                 } else {
-                    move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted, halfGhostsCollected);
+                    move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted, halfGhostsCollected, prevMoveBustCnt);
                 }
 
                 moves.add(move);
@@ -105,6 +106,8 @@ public class Interactor {
                 }
                 printMove(buster, move);
             }
+
+            Arrays.fill(prevMoveBustCnt, 0);
             for (int i = 0; i < allies.size(); i++) {
                 Buster buster = allies.get(i);
                 Move move = moves.get(i);
@@ -113,6 +116,9 @@ public class Interactor {
                     if (ghostsCollectedCnt >= ghostCnt / 2) {
                         halfGhostsCollected = true;
                     }
+                }
+                if (move.type == BUST) {
+                    prevMoveBustCnt[move.targetId]++;
                 }
             }
             phantomUpdater.updateAfterMoves(phantomEnemies, phantomGhosts, allies, enemies, moves);

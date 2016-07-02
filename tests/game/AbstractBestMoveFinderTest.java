@@ -41,6 +41,7 @@ public class AbstractBestMoveFinderTest {
         List<BusterBuilder> enemies = new ArrayList<>();
         List<Ghost> ghosts = new ArrayList<>();
         Set<Integer> alreadyBusted = new HashSet<>();
+        int[] prevMoveBustCnt = new int[100];
 
         BusterBuilder ally(int x, int y) {
             int id = allies.size() + enemies.size();
@@ -91,7 +92,8 @@ public class AbstractBestMoveFinderTest {
                 ),
                 Collections.emptySet(),
                 testBuilder.alreadyBusted,
-                false
+                false,
+                testBuilder.prevMoveBustCnt
         );
         expected = simplify(buster, expected, testGameParameters);
         actual = simplify(buster, actual, testGameParameters);
