@@ -4,6 +4,7 @@ import java.util.*;
 
 import static game.Move.*;
 import static game.Utils.*;
+import static java.lang.Math.*;
 
 public class BestMoveFinder {
 
@@ -133,6 +134,7 @@ public class BestMoveFinder {
         for (Ghost ghost : ghosts) {
             int alliesInBustRange = getInBustRange(ghost, allies);
             int enemiesInBustRange = getInBustRange(ghost, enemies);
+            enemiesInBustRange = max(enemiesInBustRange, ghost.bustCnt - alliesInBustRange);
             if (enemiesInBustRange > alliesInBustRange) {
                 r.add(ghost.id);
             }
@@ -181,7 +183,7 @@ public class BestMoveFinder {
         for (Buster ally : allies) {
             double dist = dist(ally, lastPosition);
             dist -= gameParameters.STUN_RANGE;
-            double movesNeeded = (int) Math.ceil(dist / gameParameters.MOVE_RANGE);
+            double movesNeeded = (int) ceil(dist / gameParameters.MOVE_RANGE);
             movesNeeded += ally.remainingStunDuration;
             if (movesNeeded <= afterTicks && ally.remainingStunCooldown <= afterTicks) {
                 return true;

@@ -384,4 +384,11 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ghost(3, 10, 15);
         checkMove(move(0, 10));
     }
+
+    @Test
+    void dontHelpEnemyBustEvenWhenWeCantSeeThem() {
+        ally(0, 10);
+        ghost(3, 10, 15, 3);
+        checkMove(move(0, 10));
+    }
 }
