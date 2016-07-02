@@ -133,13 +133,37 @@ public class BestMoveFinder {
         Set<Integer> r = new HashSet<>();
         for (Ghost ghost : ghosts) {
             int alliesInBustRange = getInBustRange(ghost, allies);
+            if (alliesInBustRange == 0) {
+                continue;
+            }
+
             int enemiesInBustRange = getInBustRange(ghost, enemies);
+            int movesToBust = divUp(ghost.stamina, alliesInBustRange);
+            enemiesInBustRange += getStunnedButDangerousEnemies(ghost, enemies, movesToBust);
+
             enemiesInBustRange = max(enemiesInBustRange, ghost.bustCnt - alliesInBustRange);
             if (enemiesInBustRange > alliesInBustRange) {
                 r.add(ghost.id);
             }
         }
         return r;
+    }
+
+    private int getStunnedButDangerousEnemies(Ghost ghost, List<Buster> enemies, int movesToBust) {
+        int cnt = 0;
+        for (Buster enemy : enemies) {
+            if (enemy.remainingStunDuration == 0) {
+                continue;
+            }
+            if (enemy.remainingStunDuration < movesToBust) {
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+
+    private int divUp(int a, int b) {
+        return (a + b - 1) / b;
     }
 
     private int getInBustRange(Ghost ghost, List<Buster> busters) {
