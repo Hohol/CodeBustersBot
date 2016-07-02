@@ -17,11 +17,11 @@ public class Interactor {
         List<CheckPoint> checkPoints = genCheckPoints(gameParameters);
         IntReader in = new IntReader(scanner);
         int bustersPerPlayer = in.nextInt(); // the amount of busters you control
-        int ghostCount = in.nextInt(); // the amount of ghosts on the map
+        int ghostCnt = in.nextInt(); // the amount of ghosts on the map
         int myTeamId = in.nextInt(); // if this is 0, your base is on the top left of the map, if it is one, on the bottom right
         Point topLeftCorner = new Point(0, 0);
-        Point myBasePosition = myTeamId == 0 ? topLeftCorner : Utils.getEnemyBase(topLeftCorner, gameParameters);
-        Point enemyBase = Utils.getEnemyBase(myBasePosition, gameParameters);
+        Point myBase = myTeamId == 0 ? topLeftCorner : Utils.getEnemyBase(topLeftCorner, gameParameters);
+        Point enemyBase = Utils.getEnemyBase(myBase, gameParameters);
 
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
         Arrays.fill(lastStunUsed, -gameParameters.STUN_COOLDOWN - 5);
@@ -32,6 +32,8 @@ public class Interactor {
         List<Buster> prevAllies = new ArrayList<>();
         boolean exploring = true;
         boolean weSawCenter = false;
+        int ghostsCollectedCnt = 0;
+        boolean halfGhostsCollected = false;
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -88,9 +90,9 @@ public class Interactor {
             for (Buster buster : allies) {
                 Move move;
                 if ((exploring || !weSawCenter) && !buster.isCarryingGhost && !someSmallGhostNearby(buster, ghosts)) {
-                    move = bestMoveFinder.findExploringMove(buster, allies, myBasePosition, weSawCenter);
+                    move = bestMoveFinder.findExploringMove(buster, allies, myBase, weSawCenter);
                 } else {
-                    move = bestMoveFinder.findBestMove(buster, myBasePosition, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted);
+                    move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted, halfGhostsCollected);
                 }
 
                 moves.add(move);
@@ -102,6 +104,16 @@ public class Interactor {
                     alreadyBusted.add(move.targetId);
                 }
                 printMove(buster, move);
+            }
+            for (int i = 0; i < allies.size(); i++) {
+                Buster buster = allies.get(i);
+                Move move = moves.get(i);
+                if (move.type == RELEASE && dist(buster, myBase) <= gameParameters.RELEASE_RANGE) {
+                    ghostsCollectedCnt++;
+                    if (ghostsCollectedCnt >= ghostCnt / 2) {
+                        halfGhostsCollected = true;
+                    }
+                }
             }
             phantomUpdater.updateAfterMoves(phantomEnemies, phantomGhosts, allies, enemies, moves);
             prevEnemies = enemies;

@@ -26,7 +26,8 @@ public class BestMoveFinder {
             List<Ghost> ghosts,
             List<CheckPoint> checkPoints,
             Set<Integer> alreadyStunnedEnemies,
-            Set<Integer> alreadyBusted
+            Set<Integer> alreadyBusted,
+            boolean halfGhostsCollected
     ) {
         if (buster.remainingStunDuration > 0) {
             return release();
@@ -44,7 +45,7 @@ public class BestMoveFinder {
             ghosts = removeFatGhosts(ghosts);
         }
         Point checkPoint = getCheckPoint(buster, checkPoints);
-        return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted, checkPoints);
+        return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted, checkPoints, halfGhostsCollected);
     }
 
     private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
@@ -65,7 +66,8 @@ public class BestMoveFinder {
             List<Ghost> ghosts,
             Point checkPoint,
             Set<Integer> alreadyBusted,
-            List<CheckPoint> checkPoints
+            List<CheckPoint> checkPoints,
+            boolean halfGhostsCollected
     ) {
         Set<Move> possibleMoves = new LinkedHashSet<>();
         possibleMoves.add(move(moveToWithAllowedRange(buster.x, buster.y, myBase.x, myBase.y, gameParameters.RELEASE_RANGE)));
@@ -99,7 +101,7 @@ public class BestMoveFinder {
             }
         }
         boolean someOfUsCanCatchSomeEnemyWithGhost = checkSomeOfUsCanCatchEnemyWithGhost(allies, enemies, enemiesWithGhostNextPositions);
-        List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies, myBase);
+        List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies, myBase, halfGhostsCollected);
         for (Buster ally : alliesWhoNeedEscort) {
             possibleMoves.add(move(ally.x, ally.y));
             Point nextPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
@@ -222,19 +224,22 @@ public class BestMoveFinder {
         return false;
     }
 
-    private List<Buster> getAlliesWhoNeedEscort(List<Buster> allies, List<Buster> enemies, Point myBase) {
+    private List<Buster> getAlliesWhoNeedEscort(List<Buster> allies, List<Buster> enemies, Point myBase, boolean halfGhostsCollected) {
         List<Buster> r = new ArrayList<>();
         for (Buster ally : allies) {
-            if (needsEscort(ally, enemies, myBase)) {
+            if (needsEscort(ally, enemies, myBase, halfGhostsCollected)) {
                 r.add(ally);
             }
         }
         return r;
     }
 
-    private boolean needsEscort(Buster ally, List<Buster> enemies, Point myBase) {
+    private boolean needsEscort(Buster ally, List<Buster> enemies, Point myBase, boolean halfGhostsCollected) {
         if (!ally.isCarryingGhost) {
             return false;
+        }
+        if (halfGhostsCollected) {
+            return true;
         }
         Point newCourierPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
         for (Buster enemy : enemies) {

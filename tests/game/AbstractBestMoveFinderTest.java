@@ -90,7 +90,8 @@ public class AbstractBestMoveFinderTest {
                         new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2))
                 ),
                 Collections.emptySet(),
-                testBuilder.alreadyBusted
+                testBuilder.alreadyBusted,
+                false
         );
         expected = simplify(buster, expected, testGameParameters);
         actual = simplify(buster, actual, testGameParameters);
