@@ -131,7 +131,7 @@ public class BestMoveFinder {
                 continue;
             }
             for (Buster ally : allies) {
-                if (ally.hasStun() && dist(ally, enemy) <= gameParameters.STUN_RANGE) {
+                if (ally.remainingStunDuration == 0 && ally.hasStun() && dist(ally, enemy) <= gameParameters.STUN_RANGE) {
                     return true;
                 }
             }
@@ -153,6 +153,7 @@ public class BestMoveFinder {
             double dist = dist(ally, lastPosition);
             dist -= gameParameters.STUN_RANGE;
             double movesNeeded = (int) Math.ceil(dist / gameParameters.MOVE_RANGE);
+            movesNeeded += ally.remainingStunDuration;
             if (movesNeeded <= afterTicks && ally.remainingStunCooldown <= afterTicks) {
                 return true;
             }
