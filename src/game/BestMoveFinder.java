@@ -41,7 +41,7 @@ public class BestMoveFinder {
             return move;
         }
         boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
-        if (!iVeSeenItAll) {
+        if (!iVeSeenItAll && !halfGhostsCollected) {
             ghosts = removeFatGhosts(ghosts);
         }
         Point checkPoint = getCheckPoint(buster, checkPoints);
