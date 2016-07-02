@@ -72,6 +72,7 @@ public class BestMoveFinder {
         possibleMoves.add(move(buster.x, buster.y));
         for (Buster enemy : enemies) {
             possibleMoves.add(move(runawayPoint(enemy.x, enemy.y, buster.x, buster.y, gameParameters.MOVE_RANGE)));
+            possibleMoves.add(move(moveToBeOutsideRange(buster.x, buster.y, enemy.x, enemy.y, gameParameters.MIN_BUST_RANGE)));
         }
         Set<Integer> forbiddenGhosts = getForbiddenGhosts(ghosts, allies, enemies);
         for (Ghost ghost : ghosts) {
@@ -91,6 +92,10 @@ public class BestMoveFinder {
         for (List<Buster> list : enemiesWithGhostNextPositions) {
             for (Buster enemyPosition : list) {
                 possibleMoves.add(move(enemyPosition.x, enemyPosition.y));
+            }
+            if (!list.isEmpty()) {
+                Buster afterOneMove = list.get(0);
+                possibleMoves.add(move(moveToBeOutsideRange(buster.x, buster.y, afterOneMove.x, afterOneMove.y, gameParameters.MIN_BUST_RANGE)));
             }
         }
         boolean someOfUsCanCatchSomeEnemyWithGhost = checkSomeOfUsCanCatchEnemyWithGhost(allies, enemies, enemiesWithGhostNextPositions);
@@ -155,7 +160,8 @@ public class BestMoveFinder {
             if (enemy.remainingStunDuration == 0) {
                 continue;
             }
-            if (enemy.remainingStunDuration < movesToBust) {
+            double dist = dist(enemy, ghost);
+            if (enemy.remainingStunDuration < movesToBust && dist >= gameParameters.MIN_BUST_RANGE && dist <= gameParameters.MAX_BUST_RANGE) {
                 cnt++;
             }
         }

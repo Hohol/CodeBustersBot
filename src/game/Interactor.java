@@ -72,11 +72,11 @@ public class Interactor {
             phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase, round);
             phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies);
 
-            print(ghosts, "Ghosts");
-            print(phantomGhosts, "Phantom ghosts");
-            print(enemies, "Enemies");
-            print(allies, "Allies");
-            print(phantomEnemies, "Phantom enemies");
+//            print(ghosts, "Ghosts");
+//            print(phantomGhosts, "Phantom ghosts");
+//            print(enemies, "Enemies");
+//            print(allies, "Allies");
+//            print(phantomEnemies, "Phantom enemies");
 
             if (!enemies.isEmpty() || round >= 8) {
                 exploring = false;

@@ -92,16 +92,9 @@ public class AbstractBestMoveFinderTest {
                 Collections.emptySet(),
                 testBuilder.alreadyBusted
         );
-        expected = simplify(buster, expected);
-        actual = simplify(buster, actual);
+        expected = simplify(buster, expected, testGameParameters);
+        actual = simplify(buster, actual, testGameParameters);
         assertEquals(actual, expected);
-    }
-
-    private Move simplify(Buster buster, Move move) {
-        if (move.type != MoveType.MOVE) {
-            return move;
-        }
-        return Move.move(getNewPosition(buster, move, testGameParameters));
     }
 
     public static List<Buster> buildBusters(List<BusterBuilder> busters) {

@@ -33,6 +33,7 @@ public class Evaluator {
         List<Buster> allBusters = new ArrayList<>(allies);
         allBusters.addAll(enemies);
         ghosts = moveGhosts(ghosts, move, allBusters, alreadyBusted);
+        List<Buster> currentEnemies = enemies;
         enemies = moveEnemies(enemies, myBase);
 
 
@@ -46,7 +47,7 @@ public class Evaluator {
         boolean weSeeSomeGhost = !ghosts.isEmpty();
         MovesAndDist movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemies, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
         double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase, enemies);
-        double minDistToEnemyWithGhost = getMinDistToEnemyWithGhost(newMyPosition, enemies);
+        double minDistToEnemyWithGhost = getMinDistToEnemyWithGhost(newMyPosition, currentEnemies);
         return new EvaluationState(
                 canBeStunned,
                 iHaveStun,
@@ -69,7 +70,11 @@ public class Evaluator {
             if (!enemy.isCarryingGhost) {
                 continue;
             }
-            r = min(r, dist(newMyPosition, enemy));
+            double dist = dist(newMyPosition, enemy);
+            if (enemy.remainingStunCooldown == 0 && dist < gameParameters.MIN_BUST_RANGE) {
+                dist += 100500;
+            }
+            r = min(r, dist);
         }
         return r;
     }
@@ -120,12 +125,18 @@ public class Evaluator {
             if (list.isEmpty()) {
                 continue;
             }
-            Buster currentState = getWithId(enemies, list.get(0).id);
+            Buster enemyAfterOneMove = list.get(0);
+            Buster currentState = getWithId(enemies, enemyAfterOneMove.id);
             int movesToStunEnemy = getMovesToStunEnemy(newMyPosition, list, remainingStunCooldown);
             if (movesToStunEnemy == MovesAndDist.INFINITY.moves) {
                 continue;
             }
-            MovesAndDist m = new MovesAndDist(movesToStunEnemy, dist(newMyPosition, currentState));
+            double dist = dist(newMyPosition, currentState);
+            //noinspection ConstantConditions
+            if (currentState.remainingStunCooldown == 1 && movesToStunEnemy == 1 && dist(newMyPosition, enemyAfterOneMove) < gameParameters.MIN_BUST_RANGE) {
+                dist += 100500;
+            }
+            MovesAndDist m = new MovesAndDist(movesToStunEnemy, dist);
             if (m.compareTo(r) < 0) {
                 r = m;
             }
@@ -137,7 +148,7 @@ public class Evaluator {
         for (int k = remainingStunCooldown; k < enemyStates.size(); k++) {
             Buster enemy = enemyStates.get(k);
             if (canGetInStunRangeInKMoves(newMyPosition, enemy, k)) {
-                return k;
+                return k + 1;
             }
         }
         return Integer.MAX_VALUE;

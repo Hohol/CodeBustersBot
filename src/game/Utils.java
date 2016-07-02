@@ -154,4 +154,11 @@ public class Utils {
         p = getNewPosition(courier.x, courier.y, p.x, p.y, gameParameters.MOVE_RANGE, gameParameters);
         return p;
     }
+
+    static Move simplify(Buster buster, Move move, GameParameters gameParameters) {
+        if (move.type != MoveType.MOVE) {
+            return move;
+        }
+        return Move.move(getNewPosition(buster, move, gameParameters));
+    }
 }
