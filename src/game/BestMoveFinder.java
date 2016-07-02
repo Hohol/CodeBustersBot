@@ -97,6 +97,7 @@ public class BestMoveFinder {
             Point nextPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
             possibleMoves.add(move(nextPosition));
             possibleMoves.add(move(moveToBeOutsideRange(buster.x, buster.y, nextPosition.x, nextPosition.y, gameParameters.MIN_BUST_RANGE)));
+            possibleMoves.add(move(moveToBeOutsideRange(buster.x, buster.y, ally.x, ally.y, gameParameters.MIN_BUST_RANGE)));
         }
 
         Move bestMove = null;

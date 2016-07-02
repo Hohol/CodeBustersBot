@@ -149,7 +149,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
     void chaseEnemy() {
         ally(50, 45);
         enemy(50, 36).carryingGhost();
-        checkMove(Move.move(50, 36));
+        checkMove(move(50, 36));
     }
 
     @Test
@@ -244,7 +244,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
     void dontStayTooCloseToCourier() {
         ally(4, 8);
         ally(0, 10).carryingGhost();
-        enemy(0, 15);
+        enemy(0, 4);
         checkMove(move(3, 8));
     }
 
@@ -268,7 +268,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(50, 31);
         enemy(50, 36).carryingGhost();
-        checkMove(Move.move(50, 36));
+        checkMove(move(50, 36));
     }
 
     @Test
@@ -276,7 +276,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(43, 32);
         enemy(50, 30).carryingGhost();
-        checkMove(Move.move(50, 30));
+        checkMove(move(50, 30));
     }
 
     @Test
@@ -284,7 +284,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(43, 42);
         enemy(50, 40).carryingGhost();
-        checkMove(Move.move(50, 40));
+        checkMove(move(50, 40));
     }
 
     @Test
@@ -292,7 +292,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(42, 42);
         enemy(50, 40).carryingGhost();
-        checkMove(Move.move(25, 25));
+        checkMove(move(25, 25));
     }
 
     @Test
@@ -300,7 +300,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(43, 42).stunCooldown(1);
         enemy(50, 40).carryingGhost();
-        checkMove(Move.move(50, 40));
+        checkMove(move(50, 40));
     }
 
     @Test
@@ -308,7 +308,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(43, 42).stunCooldown(2);
         enemy(50, 40).carryingGhost();
-        checkMove(Move.move(25, 25));
+        checkMove(move(25, 25));
     }
 
     @Test
@@ -316,7 +316,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(50, 25).stunCooldown(2);
         enemy(50, 30).carryingGhost();
-        checkMove(Move.move(50, 30));
+        checkMove(move(50, 30));
     }
 
     @Test
@@ -325,7 +325,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 31);
         enemy(50, 36).carryingGhost();
         ghost(10, 10, 3);
-        checkMove(Move.move(50, 36));
+        checkMove(move(50, 36));
     }
 
     @Test
@@ -357,7 +357,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(50, 30).stunDuration(2);
         enemy(50, 30).carryingGhost();
-        checkMove(Move.move(50, 30));
+        checkMove(move(50, 30));
     }
 
     @Test
@@ -365,6 +365,14 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(50, 0);
         ally(50, 30).stunDuration(3);
         enemy(50, 30).carryingGhost();
-        checkMove(Move.move(25, 25));
+        checkMove(move(25, 25));
+    }
+
+    @Test
+    void courierIsGonnaUseStun() {
+        ally(0, 14);
+        ally(0, 10).carryingGhost();
+        enemy(5, 10);
+        checkMove(move(0, 13));
     }
 }

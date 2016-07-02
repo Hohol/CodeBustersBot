@@ -45,7 +45,7 @@ public class Evaluator {
         MovesAndDist movesToBustGhost = getMinMovesToBustGhost(newMyPosition, move, ghosts);
         boolean weSeeSomeGhost = !ghosts.isEmpty();
         MovesAndDist movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemies, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
-        double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase);
+        double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase, enemies);
         double minDistToEnemyWithGhost = getMinDistToEnemyWithGhost(newMyPosition, enemies);
         return new EvaluationState(
                 canBeStunned,
@@ -74,20 +74,40 @@ public class Evaluator {
         return r;
     }
 
-    private double getDistToAllyWhoNeedsEscort(Buster buster, Point newMyPosition, List<Buster> alliesWhoNeedEscort, Point myBase) {
+    private double getDistToAllyWhoNeedsEscort(Buster buster, Point newMyPosition, List<Buster> alliesWhoNeedEscort, Point myBase, List<Buster> enemies) {
         if (getWithId(alliesWhoNeedEscort, buster.id) != null) {
             return 0;
         }
         double r = Double.POSITIVE_INFINITY;
         for (Buster courier : alliesWhoNeedEscort) {
-            Point p = getPositionAfterMovingToBase(courier, myBase, gameParameters);
-            double dist = dist(newMyPosition, p);
+            Point nextCourierPosition;
+            if (gonnaUseStun(courier, enemies)) {
+                nextCourierPosition = new Point(courier.x, courier.y);
+            } else {
+                nextCourierPosition = getPositionAfterMovingToBase(courier, myBase, gameParameters);
+            }
+            double dist = dist(newMyPosition, nextCourierPosition);
             if (dist < gameParameters.MIN_BUST_RANGE) {
                 dist += 100500;
             }
             r = min(r, dist);
         }
         return r;
+    }
+
+    private boolean gonnaUseStun(Buster courier, List<Buster> enemies) {
+        if (!courier.hasStun()) {
+            return false;
+        }
+        for (Buster enemy : enemies) {
+            if (enemy.remainingStunDuration > 1) {
+                continue;
+            }
+            if (dist(courier, enemy) <= gameParameters.STUN_RANGE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private MovesAndDist getMovesToStunEnemyWithGhost(Point newMyPosition, List<Buster> enemies, List<List<Buster>> enemiesWithGhostNextPositions, int remainingStunCooldown) {
