@@ -38,6 +38,7 @@ public class Interactor {
         Set<Integer> seenGhosts = new HashSet<>();
         Set<Point> allMyPreviousPositions = new HashSet<>();
         List<Point> initialEnemyPositions = null;
+        Set<Integer> knownGhostType = new HashSet<>();
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -91,6 +92,7 @@ public class Interactor {
             phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies, seenGhosts, allMyPreviousPositions, enemyBase);
             for (Ghost ghost : ghosts) {
                 seenGhosts.add(ghost.id);
+                knownGhostType.add(ghost.id);
             }
 
 //            print(ghosts, "Ghosts");
@@ -111,7 +113,8 @@ public class Interactor {
                 if ((exploring || !weSawCenter) && !buster.isCarryingGhost && !seeSomeSmallGhostNearCenter(buster, ghosts, initialEnemyPositions, round)) {
                     move = bestMoveFinder.findExploringMove(buster, allies, myBase, weSawCenter);
                 } else {
-                    move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted, halfGhostsCollected, prevMoveBustCnt);
+                    boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase, knownGhostType, ghostCnt);
+                    move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted, halfGhostsCollected, prevMoveBustCnt, iVeSeenItAll);
                 }
 
                 moves.add(move);
@@ -248,6 +251,46 @@ public class Interactor {
     private int getCd(int lastStunUsed, int round, GameParameters gameParameters) {
         int stunDelta = round - lastStunUsed;
         return stunDelta < gameParameters.STUN_COOLDOWN ? gameParameters.STUN_COOLDOWN - stunDelta : 0;
+    }
+
+    private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints, Point myBase, Set<Integer> knownGhostTypes, int ghostCnt) {
+        if (allGhostTypesAreKnown(knownGhostTypes, ghostCnt)) {
+            return true;
+        }
+        Point enemyBase = getEnemyBase(myBase, gameParameters);
+        for (CheckPoint checkPoint : checkPoints) {
+            if (shouldBeeSeen(myBase, enemyBase, checkPoint.p)) {
+                if (checkPoint.lastSeen == CheckPoint.NEVER) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean allGhostTypesAreKnown(Set<Integer> knownGhostTypes, int ghostCnt) {
+        if (!knownGhostTypes.contains(0)) {
+            return false;
+        }
+        for (int id = 1; id < ghostCnt; id += 2) {
+            if (!knownGhostTypes.contains(id) && !knownGhostTypes.contains(id + 1)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean shouldBeeSeen(Point myBase, Point enemyBase, Point p) {
+        if (dist(p, myBase) <= dist(p, enemyBase) + 5) {
+            return true;
+        }
+        /*if (p.x == 0 && p.y == gameParameters.W - 1) {
+            return true;
+        }
+        if (p.x == gameParameters.H - 1 && p.y == 0) {
+            return true;
+        }*/
+        return false;
     }
 
     static class IntReader {

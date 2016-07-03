@@ -28,7 +28,8 @@ public class BestMoveFinder {
             Set<Integer> alreadyStunnedEnemies,
             Set<Integer> alreadyBusted,
             boolean halfGhostsCollected,
-            int[] prevMoveBustCnt
+            int[] prevMoveBustCnt,
+            boolean iVeSeenItAll
     ) {
         if (buster.remainingStunDuration > 0) {
             return release();
@@ -41,7 +42,6 @@ public class BestMoveFinder {
         if ((move = tryStunEnemy(buster, enemies, alreadyStunnedEnemies)) != null) {
             return move;
         }
-        boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
 
         if (halfGhostsCollected) {
             ghosts = leaveOnlyClosestToBase(ghosts, myBase);
@@ -411,32 +411,6 @@ public class BestMoveFinder {
         if (newCanTakeGhost != oldCanTakeGhost) {
             return newCanTakeGhost;
         }
-        return false;
-    }
-
-    private boolean checkIVeSeenItAll(List<CheckPoint> checkPoints, Point myBase) {
-        GameParameters gameParameters = this.gameParameters;
-        Point enemyBase = getEnemyBase(myBase, gameParameters);
-        for (CheckPoint checkPoint : checkPoints) {
-            if (shouldBeeSeen(myBase, enemyBase, checkPoint.p)) {
-                if (checkPoint.lastSeen == CheckPoint.NEVER) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean shouldBeeSeen(Point myBase, Point enemyBase, Point p) {
-        if (dist(p, myBase) <= dist(p, enemyBase) + 5) {
-            return true;
-        }
-        /*if (p.x == 0 && p.y == gameParameters.W - 1) {
-            return true;
-        }
-        if (p.x == gameParameters.H - 1 && p.y == 0) {
-            return true;
-        }*/
         return false;
     }
 
