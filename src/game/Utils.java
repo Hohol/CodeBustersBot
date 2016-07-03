@@ -165,4 +165,8 @@ public class Utils {
     static boolean inBustRange(double dist, GameParameters gameParameters) {
         return dist >= gameParameters.MIN_BUST_RANGE && dist <= gameParameters.MAX_BUST_RANGE;
     }
+
+    static double dist(Ghost g, Point p) {
+        return dist(g.x, g.y, p.x, p.y);
+    }
 }

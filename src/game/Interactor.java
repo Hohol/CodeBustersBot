@@ -35,6 +35,8 @@ public class Interactor {
         int ghostsCollectedCnt = 0;
         boolean halfGhostsCollected = false;
         int[] prevMoveBustCnt = new int[ghostCnt];
+        Set<Integer> seenGhosts = new HashSet<>();
+        Set<Point> allMyPreviousPositions = new HashSet<>();
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -72,8 +74,20 @@ public class Interactor {
                 weSawCenter = true;
             }
 
+            for (Buster ally : allies) {
+                allMyPreviousPositions.add(new Point(ally.x, ally.y));
+            }
+            for (Buster enemy : enemies) {
+                if (enemy.isCarryingGhost) {
+                    seenGhosts.add(enemy.ghostId);
+                }
+            }
+
             phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase, round);
-            phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies);
+            phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies, seenGhosts, allMyPreviousPositions);
+            for (Ghost ghost : ghosts) {
+                seenGhosts.add(ghost.id);
+            }
 
 //            print(ghosts, "Ghosts");
 //            print(phantomGhosts, "Phantom ghosts");

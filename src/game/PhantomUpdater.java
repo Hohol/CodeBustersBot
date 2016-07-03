@@ -3,6 +3,7 @@ package game;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import static game.MoveType.STUN;
 import static game.Utils.*;
@@ -67,7 +68,7 @@ public class PhantomUpdater {
         return false;
     }
 
-    public List<Ghost> updatePhantomGhosts(List<Ghost> ghosts, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies) {
+    public List<Ghost> updatePhantomGhosts(List<Ghost> ghosts, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies, Set<Integer> seenGhosts, Set<Point> allMyPreviousPositions) {
         ArrayList<Ghost> r = new ArrayList<>();
         r.addAll(ghosts);
 
@@ -87,7 +88,53 @@ public class PhantomUpdater {
             }
             r.add(newGhostState);
         }
+        for (Ghost ghost : ghosts) {
+            if (ghost.id == 0) {
+                continue;
+            }
+            Ghost mirrorImage = getMirrorImage(ghost);
+            if (seenGhosts.contains(ghost.id) || seenGhosts.contains(mirrorImage.id)) {
+                continue;
+            }
+            if (weSawThisPosition(mirrorImage, allMyPreviousPositions)) {
+                continue;
+            }
+            r.add(mirrorImage);
+        }
         return r;
+    }
+
+    private boolean weSawThisPosition(Ghost mirrorImage, Set<Point> allMyPreviousPositions) {
+        for (Point p : allMyPreviousPositions) {
+            if (dist(mirrorImage, p) <= gameParameters.FOG_RANGE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Ghost getMirrorImage(Ghost ghost) {
+        return new Ghost(getMirrorId(ghost.id), gameParameters.H - ghost.x - 1, gameParameters.W - ghost.y - 1, getInitialStamina(ghost.stamina), 0);
+    }
+
+    private int getInitialStamina(int stamina) {
+        if (stamina > 15) {
+            return 40;
+        }
+        if (stamina > 3) {
+            return 15;
+        }
+        return 3;
+    }
+
+    private int getMirrorId(int id) {
+        if (id == 0) {
+            throw new RuntimeException();
+        }
+        if (id % 2 == 0) {
+            return id - 1;
+        }
+        return id + 1;
     }
 
     private boolean carriesGhostWithId(List<Buster> allBusters, int ghostId) {

@@ -3,6 +3,8 @@ package game;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -96,11 +98,11 @@ public class PhantomUpdaterTest {
 
     @Test
     void testGhosts() {
-        List<Ghost> ghosts = asList(ghost(0, 0, 0));
-        List<Ghost> phantomGhosts = asList();
+        List<GhostBuilder> ghosts = asList(ghost(0, 0, 0));
+        List<GhostBuilder> phantomGhosts = asList();
         List<Buster> allies = asList();
         List<Buster> enemies = asList();
-        List<Ghost> expected = asList(ghost(0, 0, 0));
+        List<GhostBuilder> expected = asList(ghost(0, 0, 0));
         checkGhosts(
                 ghosts,
                 phantomGhosts,
@@ -112,11 +114,11 @@ public class PhantomUpdaterTest {
 
     @Test
     void testGhosts2() {
-        List<Ghost> ghosts = asList();
-        List<Ghost> phantomGhosts = asList(ghost(0, 0, 0));
+        List<GhostBuilder> ghosts = asList();
+        List<GhostBuilder> phantomGhosts = asList(ghost(0, 0, 0));
         List<Buster> allies = asList();
         List<Buster> enemies = asList();
-        List<Ghost> expected = asList(ghost(0, 0, 0));
+        List<GhostBuilder> expected = asList(ghost(0, 0, 0));
         checkGhosts(
                 ghosts,
                 phantomGhosts,
@@ -128,11 +130,11 @@ public class PhantomUpdaterTest {
 
     @Test
     void testGhosts3() {
-        List<Ghost> ghosts = asList(ghost(1, 1, 0));
-        List<Ghost> phantomGhosts = asList(ghost(0, 0, 0));
+        List<GhostBuilder> ghosts = asList(ghost(1, 1, 0));
+        List<GhostBuilder> phantomGhosts = asList(ghost(0, 0, 0));
         List<Buster> allies = asList();
         List<Buster> enemies = asList();
-        List<Ghost> expected = asList(ghost(1, 1, 0));
+        List<GhostBuilder> expected = asList(ghost(1, 1, 0));
         checkGhosts(
                 ghosts,
                 phantomGhosts,
@@ -144,11 +146,11 @@ public class PhantomUpdaterTest {
 
     @Test
     void testGhostsVision() {
-        List<Ghost> ghosts = asList();
-        List<Ghost> phantomGhosts = asList(ghost(0, 0, 0));
+        List<GhostBuilder> ghosts = asList();
+        List<GhostBuilder> phantomGhosts = asList(ghost(0, 0, 0));
         List<Buster> allies = asList(buster(0, 6, 0).build());
         List<Buster> enemies = asList();
-        List<Ghost> expected = asList();
+        List<GhostBuilder> expected = asList();
         checkGhosts(
                 ghosts,
                 phantomGhosts,
@@ -160,11 +162,11 @@ public class PhantomUpdaterTest {
 
     @Test
     void testGhostsMove() {
-        List<Ghost> ghosts = asList();
-        List<Ghost> phantomGhosts = asList(ghost(10, 10, 0));
+        List<GhostBuilder> ghosts = asList();
+        List<GhostBuilder> phantomGhosts = asList(ghost(10, 10, 0));
         List<Buster> allies = asList(buster(4, 9, 0).build());
         List<Buster> enemies = asList(buster(4, 11, 1).build());
-        List<Ghost> expected = asList(ghost(11, 10, 0));
+        List<GhostBuilder> expected = asList(ghost(11, 10, 0));
         checkGhosts(
                 ghosts,
                 phantomGhosts,
@@ -176,11 +178,11 @@ public class PhantomUpdaterTest {
 
     @Test
     void testBusterCarriesGhost() {
-        List<Ghost> ghosts = asList();
-        List<Ghost> phantomGhosts = asList(ghost(10, 10, 0), ghost(10, 10, 1), ghost(10, 10, 2));
+        List<GhostBuilder> ghosts = asList();
+        List<GhostBuilder> phantomGhosts = asList(ghost(10, 10, 0), ghost(10, 10, 1), ghost(10, 10, 2));
         List<Buster> allies = asList(buster(0, 0, 0).carryingGhost(0).build());
         List<Buster> enemies = asList(buster(0, 0, 1).carryingGhost(1).build());
-        List<Ghost> expected = asList(ghost(10, 10, 2));
+        List<GhostBuilder> expected = asList(ghost(10, 10, 2));
         checkGhosts(
                 ghosts,
                 phantomGhosts,
@@ -197,21 +199,52 @@ public class PhantomUpdaterTest {
                         buster(0, 10, 0).build(),
                         buster(0, 11, 0).carryingGhost(3).build()
                 ),
-                ghost(0, 13, 3)
+                ghost(0, 13, 3).build()
+        );
+    }
+
+    @Test
+    void testMirrorImage() {
+        List<GhostBuilder> ghosts = asList(
+                ghost(25, 25, 0),
+                ghost(10, 0, 1).stamina(4)
+        );
+        List<GhostBuilder> phantomGhosts = asList();
+        List<Buster> allies = asList();
+        List<Buster> enemies = asList();
+        List<GhostBuilder> expected = asList(
+                ghost(25, 25, 0),
+                ghost(10, 0, 1).stamina(4),
+                ghost(40, 50, 2).stamina(15)
+        );
+        checkGhosts(
+                ghosts,
+                phantomGhosts,
+                allies,
+                enemies,
+                expected
         );
     }
 
     // --- utils
 
-    private Ghost ghost(int x, int y, int id) {
-        return new Ghost(id, x, y, 0, 0);
+    private GhostBuilder ghost(int x, int y, int id) {
+        return new GhostBuilder(id, x, y);
     }
 
-    private void checkGhosts(List<Ghost> ghosts, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies, List<Ghost> expected) {
+    private void checkGhosts(List<GhostBuilder> ghosts, List<GhostBuilder> phantomGhosts, List<Buster> allies, List<Buster> enemies, List<GhostBuilder> expected) {
         assertEquals(
-                phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies),
-                expected
+                phantomUpdater.updatePhantomGhosts(build(ghosts), build(phantomGhosts), allies, enemies, Collections.emptySet(), Collections.emptySet()),
+                build(expected)
         );
+    }
+
+    private List<Ghost> build(List<GhostBuilder> builders) {
+        List<Ghost> r = new ArrayList<>();
+        for (GhostBuilder builder : builders) {
+            r.add(builder.build());
+        }
+        return r;
     }
 
     private void checkEnemies(List<Buster> allies, List<Buster> phantomEnemies, List<Buster> enemies, List<Buster> expected) {
