@@ -13,10 +13,12 @@ import static org.testng.Assert.assertEquals;
 @Test
 public class PhantomUpdaterTest {
     PhantomUpdater phantomUpdater;
+    private GameParameters testGameParameters;
 
     @BeforeMethod
     void init() {
-        phantomUpdater = new PhantomUpdater(AbstractBestMoveFinderTest.createTestGameParameters());
+        testGameParameters = AbstractBestMoveFinderTest.createTestGameParameters();
+        phantomUpdater = new PhantomUpdater(testGameParameters);
     }
 
     @Test
@@ -207,15 +209,15 @@ public class PhantomUpdaterTest {
     void testMirrorImage() {
         List<GhostBuilder> ghosts = asList(
                 ghost(25, 25, 0),
-                ghost(10, 0, 1).stamina(4)
+                ghost(26, 0, 1).stamina(4)
         );
         List<GhostBuilder> phantomGhosts = asList();
         List<Buster> allies = asList();
         List<Buster> enemies = asList();
         List<GhostBuilder> expected = asList(
                 ghost(25, 25, 0),
-                ghost(10, 0, 1).stamina(4),
-                ghost(40, 50, 2).stamina(15)
+                ghost(26, 0, 1).stamina(4),
+                ghost(24, 50, 2).stamina(15)
         );
         checkGhosts(
                 ghosts,
@@ -234,7 +236,7 @@ public class PhantomUpdaterTest {
 
     private void checkGhosts(List<GhostBuilder> ghosts, List<GhostBuilder> phantomGhosts, List<Buster> allies, List<Buster> enemies, List<GhostBuilder> expected) {
         assertEquals(
-                phantomUpdater.updatePhantomGhosts(build(ghosts), build(phantomGhosts), allies, enemies, Collections.emptySet(), Collections.emptySet()),
+                phantomUpdater.updatePhantomGhosts(build(ghosts), build(phantomGhosts), allies, enemies, Collections.emptySet(), Collections.emptySet(), new Point(testGameParameters.H - 1, testGameParameters.W - 1)),
                 build(expected)
         );
     }

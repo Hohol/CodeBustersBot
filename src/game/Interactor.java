@@ -84,7 +84,7 @@ public class Interactor {
             }
 
             phantomEnemies = phantomUpdater.updatePhantomEnemies(allies, phantomEnemies, enemies, enemyBase, round);
-            phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies, seenGhosts, allMyPreviousPositions);
+            phantomGhosts = phantomUpdater.updatePhantomGhosts(ghosts, phantomGhosts, allies, enemies, seenGhosts, allMyPreviousPositions, enemyBase);
             for (Ghost ghost : ghosts) {
                 seenGhosts.add(ghost.id);
             }

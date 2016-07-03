@@ -68,7 +68,7 @@ public class PhantomUpdater {
         return false;
     }
 
-    public List<Ghost> updatePhantomGhosts(List<Ghost> ghosts, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies, Set<Integer> seenGhosts, Set<Point> allMyPreviousPositions) {
+    public List<Ghost> updatePhantomGhosts(List<Ghost> ghosts, List<Ghost> phantomGhosts, List<Buster> allies, List<Buster> enemies, Set<Integer> seenGhosts, Set<Point> allMyPreviousPositions, Point enemyBase) {
         ArrayList<Ghost> r = new ArrayList<>();
         r.addAll(ghosts);
 
@@ -97,6 +97,9 @@ public class PhantomUpdater {
                 continue;
             }
             if (weSawThisPosition(mirrorImage, allMyPreviousPositions)) {
+                continue;
+            }
+            if (dist(mirrorImage, enemyBase) <= gameParameters.H / 2) {
                 continue;
             }
             r.add(mirrorImage);
