@@ -514,4 +514,43 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
 
         checkMove(bust(0));
     }
+
+    @Test
+    void dontUseStunTest() {
+        halfGhostsCollected();
+        ally(0, 10);
+        enemy(0, 10);
+        ghost(3, 10, 26);
+        checkMove(bust(0));
+    }
+
+    @Test
+    void dontUseStunTest2() {
+        testGameParameters.STUN_RANGE = 6;
+        halfGhostsCollected();
+        ally(50, 10);
+        enemy(50, 16);
+        ghost(50, 13, 8);
+        checkMove(stun(1));
+    }
+
+    @Test
+    void dontUseStunTest3() {
+        testGameParameters.STUN_RANGE = 6;
+        halfGhostsCollected();
+        ally(50, 10);
+        enemy(50, 16);
+        ghost(50, 13, 9);
+        checkMove(stun(1));
+    }
+
+    @Test
+    void dontUseStunTest4() {
+        testGameParameters.STUN_RANGE = 6;
+        halfGhostsCollected();
+        ally(0, 23);
+        enemy(0, 17);
+        ghost(0, 20, 9);
+        checkMove(bust(0));
+    }
 }

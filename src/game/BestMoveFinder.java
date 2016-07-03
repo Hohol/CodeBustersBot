@@ -39,7 +39,7 @@ public class BestMoveFinder {
         if ((move = tryReleaseGhost(buster, myBase)) != null) {
             return move;
         }
-        if ((move = tryStunEnemy(buster, enemies, alreadyStunnedEnemies)) != null) {
+        if ((move = tryStunEnemy(buster, enemies, alreadyStunnedEnemies, halfGhostsCollected, allies, ghosts, myBase)) != null) {
             return move;
         }
 
@@ -396,13 +396,13 @@ public class BestMoveFinder {
         return r;
     }
 
-    private Move tryStunEnemy(Buster buster, List<Buster> enemies, Set<Integer> alreadyStunnedEnemies) {
+    private Move tryStunEnemy(Buster buster, List<Buster> enemies, Set<Integer> alreadyStunnedEnemies, boolean halfGhostsCollected, List<Buster> allies, List<Ghost> ghosts, Point myBase) {
         if (buster.remainingStunCooldown > 0) {
             return null;
         }
         Buster bestTarget = null;
         for (Buster enemy : enemies) {
-            if (shouldNotUseStun(buster, enemy, alreadyStunnedEnemies)) {
+            if (shouldNotUseStun(buster, enemy, alreadyStunnedEnemies, halfGhostsCollected, allies, ghosts, enemies, myBase)) {
                 continue;
             }
             if (betterTarget(buster, enemy, bestTarget)) {
@@ -415,7 +415,7 @@ public class BestMoveFinder {
         return stun(bestTarget.id);
     }
 
-    private boolean shouldNotUseStun(Buster buster, Buster enemy, Set<Integer> alreadyStunnedEnemies) {
+    private boolean shouldNotUseStun(Buster buster, Buster enemy, Set<Integer> alreadyStunnedEnemies, boolean halfGhostsCollected, List<Buster> allies, List<Ghost> ghosts, List<Buster> enemies, Point myBase) {
         if (alreadyStunnedEnemies.contains(enemy.id)) {
             return true;
         }
@@ -424,6 +424,60 @@ public class BestMoveFinder {
         }
         if (enemy.remainingStunDuration > 1) {
             return true;
+        }
+        if (thatWeirdCaseWhenYouShouldNotStun(halfGhostsCollected, allies, ghosts, enemies, myBase)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean thatWeirdCaseWhenYouShouldNotStun(boolean halfGhostsCollected, List<Buster> allies, List<Ghost> ghosts, List<Buster> enemies, Point myBase) {
+        if (!halfGhostsCollected) {
+            return false;
+        }
+        if (ghosts.isEmpty()) {
+            return false;
+        }
+        Ghost ghost = ghosts.get(0);
+
+        if (enemyCanEscapeAfterNotUsingStun(allies, enemies, myBase, ghost)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean enemyCanEscapeAfterNotUsingStun(List<Buster> allies, List<Buster> enemies, Point myBase, Ghost ghost) {
+        int busterCnt = allies.size();
+        int minMovesNeededToBustWithOneTeam = divUp(ghost.stamina, busterCnt);
+        int movesToEscape = getMovesToEscape(allies, enemies, ghost, myBase) + minMovesNeededToBustWithOneTeam;
+        if (movesToEscape > gameParameters.STUN_DURATION) {
+            return true;
+        }
+        return false;
+    }
+
+    private int getMovesToEscape(List<Buster> allies, List<Buster> enemies, Ghost ghost, Point myBase) {
+        Buster closest = null;
+        for (Buster ally : allies) {
+            if (closest == null || dist(ally, ghost) < dist(closest, ally)) {
+                closest = ally;
+            }
+        }
+        //noinspection ConstantConditions
+        Point courierPosition = new Point(closest.x, closest.y);
+        int cnt = 0;
+        while (inStunRange(courierPosition, enemies)) {
+            courierPosition = getPositionAfterMovingToBase(courierPosition.x, courierPosition.y, myBase, gameParameters);
+            cnt++;
+        }
+        return cnt;
+    }
+
+    private boolean inStunRange(Point courier, List<Buster> enemies) {
+        for (Buster enemy : enemies) {
+            if (dist(courier, enemy) <= gameParameters.STUN_RANGE) {
+                return true;
+            }
         }
         return false;
     }

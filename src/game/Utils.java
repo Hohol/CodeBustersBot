@@ -150,8 +150,12 @@ public class Utils {
     }
 
     static Point getPositionAfterMovingToBase(Buster courier, Point myBase, GameParameters gameParameters) {
-        Point p = moveToWithAllowedRange(courier.x, courier.y, myBase.x, myBase.y, gameParameters.RELEASE_RANGE);
-        p = getNewPosition(courier.x, courier.y, p.x, p.y, gameParameters.MOVE_RANGE, gameParameters);
+        return getPositionAfterMovingToBase(courier.x, courier.y, myBase, gameParameters);
+    }
+
+    static Point getPositionAfterMovingToBase(int courierX, int courierY, Point myBase, GameParameters gameParameters) {
+        Point p = moveToWithAllowedRange(courierX, courierY, myBase.x, myBase.y, gameParameters.RELEASE_RANGE);
+        p = getNewPosition(courierX, courierY, p.x, p.y, gameParameters.MOVE_RANGE, gameParameters);
         return p;
     }
 

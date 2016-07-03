@@ -39,6 +39,10 @@ public class AbstractBestMoveFinderTest {
         testBuilder.iVeSeenItAll = true;
     }
 
+    protected void halfGhostsCollected() {
+        testBuilder.halfGhostsCollected = true;
+    }
+
     static class TestBuilder {
         Point myBase = new Point(0, 0);
         List<BusterBuilder> allies = new ArrayList<>();
@@ -47,6 +51,7 @@ public class AbstractBestMoveFinderTest {
         Set<Integer> alreadyBusted = new HashSet<>();
         int[] prevMoveBustCnt = new int[100];
         public boolean iVeSeenItAll = false;
+        public boolean halfGhostsCollected = false;
 
         BusterBuilder ally(int x, int y) {
             int id = allies.size() + enemies.size();
@@ -98,7 +103,7 @@ public class AbstractBestMoveFinderTest {
                 checkPoints,
                 Collections.emptySet(),
                 testBuilder.alreadyBusted,
-                false,
+                testBuilder.halfGhostsCollected,
                 testBuilder.prevMoveBustCnt,
                 testBuilder.iVeSeenItAll);
         expected = simplify(buster, expected, testGameParameters);
