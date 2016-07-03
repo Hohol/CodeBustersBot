@@ -103,7 +103,7 @@ public class BestMoveFinder {
             }
         }
         boolean someOfUsCanCatchSomeEnemyWithGhost = checkSomeOfUsCanCatchEnemyWithGhost(allies, enemies, enemiesWithGhostNextPositions);
-        List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(allies, enemies, myBase, halfGhostsCollected);
+        List<Buster> alliesWhoNeedEscort = getAlliesWhoNeedEscort(buster, allies, enemies, myBase, halfGhostsCollected);
         for (Buster ally : alliesWhoNeedEscort) {
             possibleMoves.add(move(ally.x, ally.y));
             Point nextPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
@@ -226,37 +226,63 @@ public class BestMoveFinder {
         return false;
     }
 
-    private List<Buster> getAlliesWhoNeedEscort(List<Buster> allies, List<Buster> enemies, Point myBase, boolean halfGhostsCollected) {
+    private List<Buster> getAlliesWhoNeedEscort(Buster me, List<Buster> allies, List<Buster> enemies, Point myBase, boolean halfGhostsCollected) {
         List<Buster> r = new ArrayList<>();
         for (Buster ally : allies) {
-            if (needsEscort(ally, enemies, myBase, halfGhostsCollected)) {
+            if (needsEscort(me, ally, enemies, myBase, halfGhostsCollected, allies)) {
                 r.add(ally);
             }
         }
         return r;
     }
 
-    private boolean needsEscort(Buster ally, List<Buster> enemies, Point myBase, boolean halfGhostsCollected) {
-        if (!ally.isCarryingGhost) {
+    private boolean needsEscort(Buster me, Buster courier, List<Buster> enemies, Point myBase, boolean halfGhostsCollected, List<Buster> allies) {
+        if (!courier.isCarryingGhost) {
             return false;
         }
         if (halfGhostsCollected) {
             return true;
         }
-        Point newCourierPosition = getPositionAfterMovingToBase(ally, myBase, gameParameters);
+        Point newCourierPosition = getPositionAfterMovingToBase(courier, myBase, gameParameters);
+        int dangerousEnemiesCnt = 0;
         for (Buster enemy : enemies) {
-            if (enemy.remainingStunDuration > 0) {
+            if (isDangerous(courier, myBase, newCourierPosition, enemy)) {
+                dangerousEnemiesCnt++;
+            }
+        }
+        int escortersCloserThanMeCnt = 0;
+        for (Buster ally : allies) {
+            if (ally.id == courier.id) {
                 continue;
             }
-            if (dist(enemy, ally) <= gameParameters.STUN_RANGE) {
-                return true;
+            if (ally.isCarryingGhost) {
+                continue;
             }
-            if (dist(enemy, myBase) <= dist(ally, myBase)) {
-                return true;
+            if (ally.remainingStunDuration > 0) {
+                continue;
             }
-            if (dist(enemy, newCourierPosition) <= gameParameters.MOVE_RANGE + gameParameters.STUN_RANGE) {
-                return true;
+            if (dist(ally, courier) >= dist(ally, me)) {
+                continue;
             }
+            if (dist(ally, courier) <= gameParameters.STUN_RANGE + gameParameters.MOVE_RANGE) {
+                escortersCloserThanMeCnt++;
+            }
+        }
+        return dangerousEnemiesCnt > escortersCloserThanMeCnt;
+    }
+
+    private boolean isDangerous(Buster courier, Point myBase, Point newCourierPosition, Buster enemy) {
+        if (enemy.remainingStunDuration > 0) {
+            return false;
+        }
+        if (dist(enemy, courier) <= gameParameters.STUN_RANGE) {
+            return true;
+        }
+        if (dist(enemy, myBase) <= dist(courier, myBase)) {
+            return true;
+        }
+        if (dist(enemy, newCourierPosition) <= gameParameters.MOVE_RANGE + gameParameters.STUN_RANGE) {
+            return true;
         }
         return false;
     }

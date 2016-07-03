@@ -438,4 +438,21 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(0, 13);
         checkMove(stun(2));
     }
+
+    @Test
+    void tooManyEscorters() {
+        ally(0, 30);
+        ally(0, 10).carryingGhost();
+        ally(0, 10);
+        enemy(0, 10);
+        checkMove(move(25, 25));
+    }
+    @Test
+    void tooManyEscorters2() {
+        ally(0, 30);
+        ally(0, 10).carryingGhost();
+        ally(0, 10).stunDuration(10);
+        enemy(0, 10);
+        checkMove(move(0, 10));
+    }
 }
