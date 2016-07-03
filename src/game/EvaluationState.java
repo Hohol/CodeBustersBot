@@ -13,6 +13,7 @@ public class EvaluationState {
     private final double distToAllyWhoNeedsEscort;
     private final boolean someOfUsCanCatchEnemyWithGhost;
     private final double minDistToEnemyWithGhost;
+    private final boolean smallStunCooldown;
 
     public EvaluationState(
             boolean iCanBeStunned,
@@ -25,7 +26,10 @@ public class EvaluationState {
             boolean weSeeSomeGhost,
             Evaluator.MovesAndDist movesToStunEnemyWithGhost,
             double distToAllyWhoNeedsEscort,
-            boolean someOfUsCanCatchEnemyWithGhost, double minDistToEnemyWithGhost) {
+            boolean someOfUsCanCatchEnemyWithGhost,
+            double minDistToEnemyWithGhost,
+            boolean smallStunCooldown
+    ) {
         this.iCanBeStunned = iCanBeStunned;
         this.iHaveStun = iHaveStun;
         this.isCarryingGhost = isCarryingGhost;
@@ -38,6 +42,7 @@ public class EvaluationState {
         this.distToAllyWhoNeedsEscort = distToAllyWhoNeedsEscort;
         this.someOfUsCanCatchEnemyWithGhost = someOfUsCanCatchEnemyWithGhost;
         this.minDistToEnemyWithGhost = minDistToEnemyWithGhost;
+        this.smallStunCooldown = smallStunCooldown;
     }
 
     public boolean better(EvaluationState st) {
@@ -63,6 +68,14 @@ public class EvaluationState {
                 if (distToBase != st.distToBase) {
                     return distToBase < st.distToBase;
                 }
+            }
+        }
+        if (smallStunCooldown != st.smallStunCooldown) {
+            throw new RuntimeException();
+        }
+        if (smallStunCooldown) {
+            if (iCanBeStunned != st.iCanBeStunned) {
+                return !iCanBeStunned;
             }
         }
 

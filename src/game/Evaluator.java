@@ -48,6 +48,7 @@ public class Evaluator {
         MovesAndDist movesToStunEnemyWithGhost = getMovesToStunEnemyWithGhost(newMyPosition, enemies, enemiesWithGhostNextPositions, buster.remainingStunCooldown);
         double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase, enemies);
         double minDistToEnemyWithGhost = getMinDistToEnemyWithGhost(newMyPosition, currentEnemies);
+        boolean smallStunCooldown = buster.remainingStunCooldown > 1 && buster.remainingStunCooldown <= 5;
         return new EvaluationState(
                 canBeStunned,
                 iHaveStun,
@@ -60,7 +61,8 @@ public class Evaluator {
                 movesToStunEnemyWithGhost,
                 distToAllyWhoNeedsEscort,
                 someOfUsCanCatchEnemyWithGhost,
-                minDistToEnemyWithGhost
+                minDistToEnemyWithGhost,
+                smallStunCooldown
         );
     }
 

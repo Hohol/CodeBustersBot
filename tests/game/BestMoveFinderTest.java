@@ -455,4 +455,18 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(0, 10);
         checkMove(move(0, 10));
     }
+
+    @Test
+    void avoidFightIfSmallStunCooldown() {
+        ally(0, 25).stunCooldown(3);
+        enemy(8, 25);
+        checkMove(move(0, 25));
+    }
+
+    @Test
+    void avoidFightIfSmallStunCooldown2() {
+        ally(0, 25).stunCooldown(1);
+        enemy(8, 25);
+        checkMove(move(25, 25));
+    }
 }
