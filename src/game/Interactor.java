@@ -101,7 +101,7 @@ public class Interactor {
 //            print(allies, "Allies");
 //            print(phantomEnemies, "Phantom enemies");
 
-            if (!enemies.isEmpty() || round >= 8) {
+            if (!enemies.isEmpty() || round >= 7) {
                 exploring = false;
             }
             Set<Integer> alreadyStunnedEnemies = new HashSet<>();
