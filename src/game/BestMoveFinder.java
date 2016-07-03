@@ -172,6 +172,9 @@ public class BestMoveFinder {
     }
 
     private boolean thereIsBattleForThisGhost(Ghost ghost, List<Buster> allies, List<Buster> enemies) {
+        if (ghost.stamina == 40) {
+            return false;
+        }
         int alliesInBustRange = getInBustRange(ghost, allies);
         int enemiesInBustRange = getInBustRange(ghost, enemies);
         return alliesInBustRange > 0 && enemiesInBustRange > 0;

@@ -480,7 +480,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
 
         ally(0, 10);
         enemy(0, 10);
-        ghost(3, 10, 40);
+        ghost(3, 10, 39);
 
         checkMove(move(3, 10));
     }
@@ -499,5 +499,19 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(0, 10).carryingGhost();
         enemy(0, 14).stunDuration(1);
         checkMove(move(25, 25));
+    }
+
+    @Test
+    void thereIsNoBattleIfGhostIsFatAndNotBusted() {
+        iVeSeenItAll();
+
+        ally(0, 40);
+        ghost(3, 40, 40);
+
+        ally(0, 10);
+        enemy(0, 10);
+        ghost(3, 10, 40);
+
+        checkMove(bust(0));
     }
 }
