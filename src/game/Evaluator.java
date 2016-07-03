@@ -28,7 +28,8 @@ public class Evaluator {
             Set<Integer> alreadyBusted,
             List<List<Buster>> enemiesWithGhostNextPositions,
             List<Buster> alliesWhoNeedEscort,
-            boolean someOfUsCanCatchEnemyWithGhost
+            boolean someOfUsCanCatchEnemyWithGhost,
+            List<Point> battles
     ) {
         List<Buster> allBusters = new ArrayList<>(allies);
         allBusters.addAll(enemies);
@@ -49,6 +50,7 @@ public class Evaluator {
         double distToAllyWhoNeedsEscort = getDistToAllyWhoNeedsEscort(buster, newMyPosition, alliesWhoNeedEscort, myBase, enemies);
         double minDistToEnemyWithGhost = getMinDistToEnemyWithGhost(newMyPosition, currentEnemies);
         boolean smallStunCooldown = buster.remainingStunCooldown > 1 && buster.remainingStunCooldown <= 5;
+        double distToBattle = getDistToBattle(newMyPosition, battles);
         return new EvaluationState(
                 canBeStunned,
                 iHaveStun,
@@ -62,8 +64,18 @@ public class Evaluator {
                 distToAllyWhoNeedsEscort,
                 someOfUsCanCatchEnemyWithGhost,
                 minDistToEnemyWithGhost,
-                smallStunCooldown
+                smallStunCooldown,
+                distToBattle
         );
+    }
+
+    private double getDistToBattle(Point newMyPosition, List<Point> battles) {
+        double minDist = Double.POSITIVE_INFINITY;
+        for (Point battle : battles) {
+            minDist = min(minDist, dist(newMyPosition, battle));
+        }
+        minDist = max(minDist, gameParameters.MAX_BUST_RANGE);
+        return minDist;
     }
 
     private double getMinDistToEnemyWithGhost(Point newMyPosition, List<Buster> enemies) {

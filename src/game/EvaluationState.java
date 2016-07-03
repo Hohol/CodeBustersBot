@@ -14,6 +14,7 @@ public class EvaluationState {
     private final boolean someOfUsCanCatchEnemyWithGhost;
     private final double minDistToEnemyWithGhost;
     private final boolean smallStunCooldown;
+    private final double distToBattle;
 
     public EvaluationState(
             boolean iCanBeStunned,
@@ -28,7 +29,8 @@ public class EvaluationState {
             double distToAllyWhoNeedsEscort,
             boolean someOfUsCanCatchEnemyWithGhost,
             double minDistToEnemyWithGhost,
-            boolean smallStunCooldown
+            boolean smallStunCooldown,
+            double distToBattle
     ) {
         this.iCanBeStunned = iCanBeStunned;
         this.iHaveStun = iHaveStun;
@@ -43,6 +45,7 @@ public class EvaluationState {
         this.someOfUsCanCatchEnemyWithGhost = someOfUsCanCatchEnemyWithGhost;
         this.minDistToEnemyWithGhost = minDistToEnemyWithGhost;
         this.smallStunCooldown = smallStunCooldown;
+        this.distToBattle = distToBattle;
     }
 
     public boolean better(EvaluationState st) {
@@ -94,6 +97,10 @@ public class EvaluationState {
             if (minDistToEnemyWithGhost != st.minDistToEnemyWithGhost) {
                 return minDistToEnemyWithGhost < st.minDistToEnemyWithGhost;
             }
+        }
+
+        if (distToBattle != st.distToBattle) {
+            return distToBattle < st.distToBattle;
         }
 
         int compareMovesAndDist = movesAndDistToBustGhost.compareTo(st.movesAndDistToBustGhost);

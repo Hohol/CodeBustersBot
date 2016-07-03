@@ -447,6 +447,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         enemy(0, 10);
         checkMove(move(25, 25));
     }
+
     @Test
     void tooManyEscorters2() {
         ally(0, 30);
@@ -468,5 +469,19 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(0, 25).stunCooldown(1);
         enemy(8, 25);
         checkMove(move(25, 25));
+    }
+
+    @Test
+    void goToBattle() {
+        iVeSeenItAll();
+
+        ally(0, 40);
+        ghost(3, 40, 40);
+
+        ally(0, 10);
+        enemy(0, 10);
+        ghost(3, 10, 40);
+
+        checkMove(move(3, 10));
     }
 }

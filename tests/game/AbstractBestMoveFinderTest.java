@@ -35,6 +35,10 @@ public class AbstractBestMoveFinderTest {
         return r;
     }
 
+    protected void iVeSeenItAll() {
+        testBuilder.iVeSeenItAll = true;
+    }
+
     static class TestBuilder {
         Point myBase = new Point(0, 0);
         List<BusterBuilder> allies = new ArrayList<>();
@@ -42,6 +46,7 @@ public class AbstractBestMoveFinderTest {
         List<Ghost> ghosts = new ArrayList<>();
         Set<Integer> alreadyBusted = new HashSet<>();
         int[] prevMoveBustCnt = new int[100];
+        public boolean iVeSeenItAll = false;
 
         BusterBuilder ally(int x, int y) {
             int id = allies.size() + enemies.size();
@@ -95,7 +100,7 @@ public class AbstractBestMoveFinderTest {
                 testBuilder.alreadyBusted,
                 false,
                 testBuilder.prevMoveBustCnt,
-                false);
+                testBuilder.iVeSeenItAll);
         expected = simplify(buster, expected, testGameParameters);
         actual = simplify(buster, actual, testGameParameters);
         assertEquals(actual, expected);
