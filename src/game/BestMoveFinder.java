@@ -322,8 +322,11 @@ public class BestMoveFinder {
     }
 
     private boolean isDangerous(Buster courier, Point myBase, Point newCourierPosition, Buster enemy) {
-        if (enemy.remainingStunDuration > 0) {
+        if (enemy.remainingStunDuration > 1) {
             return false;
+        }
+        if (enemy.remainingStunDuration == 1) {
+            return dist(enemy, newCourierPosition) <= gameParameters.STUN_RANGE;
         }
         if (dist(enemy, courier) <= gameParameters.STUN_RANGE) {
             return true;
