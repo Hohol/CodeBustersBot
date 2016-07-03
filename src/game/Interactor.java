@@ -37,6 +37,7 @@ public class Interactor {
         int[] prevMoveBustCnt = new int[ghostCnt];
         Set<Integer> seenGhosts = new HashSet<>();
         Set<Point> allMyPreviousPositions = new HashSet<>();
+        List<Point> initialEnemyPositions = null;
         while (true) {
             List<Buster> allies = new ArrayList<>();
             List<Buster> enemies = new ArrayList<>();
@@ -61,6 +62,9 @@ public class Interactor {
                         enemies.add(buster);
                     }
                 }
+            }
+            if (initialEnemyPositions == null) {
+                initialEnemyPositions = getInitialEnemyPositions(allies);
             }
             System.err.println("Round: " + round);
             Set<Integer> whoUsedStunOnPrevMove = investigator.whoUsedStunOnPrevMove(allies, prevAllies, enemies, prevEnemies);
@@ -104,7 +108,7 @@ public class Interactor {
             List<Move> moves = new ArrayList<>();
             for (Buster buster : allies) {
                 Move move;
-                if ((exploring || !weSawCenter) && !buster.isCarryingGhost /*&& !someSmallGhostNearby(buster, ghosts)*/) {
+                if ((exploring || !weSawCenter) && !buster.isCarryingGhost && !seeSomeSmallGhostNearCenter(buster, ghosts, initialEnemyPositions, round)) {
                     move = bestMoveFinder.findExploringMove(buster, allies, myBase, weSawCenter);
                 } else {
                     move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted, halfGhostsCollected, prevMoveBustCnt);
@@ -143,9 +147,26 @@ public class Interactor {
         }
     }
 
-    private boolean someSmallGhostNearby(Buster buster, List<Ghost> ghosts) {
+    private List<Point> getInitialEnemyPositions(List<Buster> allies) {
+        List<Point> r = new ArrayList<>();
+        for (Buster ally : allies) {
+            r.add(new Point(gameParameters.H - ally.x - 1, gameParameters.W - ally.y - 1));
+        }
+        return r;
+    }
+
+    private boolean seeSomeSmallGhostNearCenter(Buster buster, List<Ghost> ghosts, List<Point> initialEnemyPositions, int round) {
         for (Ghost ghost : ghosts) {
-            if (ghost.stamina <= 3 && dist(buster, ghost) <= gameParameters.FOG_RANGE) {
+            if (ghost.stamina <= 3 && dist(buster, ghost) <= gameParameters.FOG_RANGE && enemiesAlreadyCanSee(initialEnemyPositions, round, ghost)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean enemiesAlreadyCanSee(List<Point> initialEnemyPositions, int round, Ghost ghost) {
+        for (Point p : initialEnemyPositions) {
+            if (dist(p, ghost) <= round * gameParameters.MOVE_RANGE + gameParameters.FOG_RANGE) {
                 return true;
             }
         }
