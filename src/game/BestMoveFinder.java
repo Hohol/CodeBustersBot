@@ -73,7 +73,7 @@ public class BestMoveFinder {
     private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
         List<Ghost> r = new ArrayList<>();
         for (Ghost ghost : ghosts) {
-            if (ghost.stamina < 30) { // magic
+            if (ghost.stamina < 15) { // magic
                 r.add(ghost);
             }
         }
@@ -431,12 +431,12 @@ public class BestMoveFinder {
         if (dist(p, myBase) <= dist(p, enemyBase) + 5) {
             return true;
         }
-        if (p.x == 0 && p.y == gameParameters.W - 1) {
+        /*if (p.x == 0 && p.y == gameParameters.W - 1) {
             return true;
         }
         if (p.x == gameParameters.H - 1 && p.y == 0) {
             return true;
-        }
+        }*/
         return false;
     }
 

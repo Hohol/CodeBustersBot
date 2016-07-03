@@ -381,14 +381,14 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(0, 10).stunCooldown(20);
         enemy(0, 10);
         enemy(0, 10);
-        ghost(3, 10, 15);
+        ghost(3, 10, 14);
         checkMove(move(0, 10));
     }
 
     @Test
     void dontHelpEnemyBustEvenWhenWeCantSeeThem() {
         ally(0, 10);
-        ghost(3, 10, 15, 3);
+        ghost(3, 10, 14, 3);
         checkMove(move(0, 10));
     }
 
@@ -397,7 +397,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(0, 10).stunCooldown(20);
         enemy(0, 10);
         enemy(0, 10).stunDuration(3);
-        ghost(3, 10, 15);
+        ghost(3, 10, 14);
         checkMove(move(0, 10));
     }
 
