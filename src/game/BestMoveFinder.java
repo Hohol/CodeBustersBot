@@ -42,11 +42,32 @@ public class BestMoveFinder {
             return move;
         }
         boolean iVeSeenItAll = checkIVeSeenItAll(checkPoints, myBase);
-        if (!iVeSeenItAll && !halfGhostsCollected) {
-            ghosts = removeFatGhosts(ghosts);
+
+        if (halfGhostsCollected) {
+            ghosts = leaveOnlyClosestToBase(ghosts, myBase);
+        } else {
+            if (!iVeSeenItAll) {
+                ghosts = removeFatGhosts(ghosts);
+            }
         }
         Point checkPoint = getCheckPoint(buster, checkPoints);
         return trySomethingSmart(buster, myBase, allies, enemies, ghosts, checkPoint, alreadyBusted, checkPoints, halfGhostsCollected, prevMoveBustCnt);
+    }
+
+    private List<Ghost> leaveOnlyClosestToBase(List<Ghost> ghosts, Point myBase) {
+        if (ghosts.isEmpty()) {
+            return ghosts;
+        }
+        Ghost closestGhost = null;
+        double minDistToBase = Double.POSITIVE_INFINITY;
+        for (Ghost ghost : ghosts) {
+            double dist = dist(ghost, myBase);
+            if (dist < minDistToBase) {
+                minDistToBase = dist;
+                closestGhost = ghost;
+            }
+        }
+        return Arrays.asList(closestGhost);
     }
 
     private List<Ghost> removeFatGhosts(List<Ghost> ghosts) {
