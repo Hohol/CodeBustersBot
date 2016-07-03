@@ -104,7 +104,7 @@ public class Interactor {
             List<Move> moves = new ArrayList<>();
             for (Buster buster : allies) {
                 Move move;
-                if ((exploring || !weSawCenter) && !buster.isCarryingGhost && !someSmallGhostNearby(buster, ghosts)) {
+                if ((exploring || !weSawCenter) && !buster.isCarryingGhost /*&& !someSmallGhostNearby(buster, ghosts)*/) {
                     move = bestMoveFinder.findExploringMove(buster, allies, myBase, weSawCenter);
                 } else {
                     move = bestMoveFinder.findBestMove(buster, myBase, allies, phantomEnemies, phantomGhosts, checkPoints, alreadyStunnedEnemies, alreadyBusted, halfGhostsCollected, prevMoveBustCnt);
