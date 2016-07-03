@@ -82,7 +82,7 @@ public class AbstractBestMoveFinderTest {
     protected void checkMove(Move expected) {
         Buster buster = testBuilder.allies.get(0).build();
         final List<CheckPoint> checkPoints = Collections.singletonList(
-                new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2))
+                new CheckPoint(new Point(testGameParameters.H / 2, testGameParameters.W / 2), CheckPoint.NEVER)
         );
         Move actual = bestMoveFinder.findBestMove(
                 buster,

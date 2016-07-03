@@ -14,7 +14,6 @@ public class Interactor {
         PhantomUpdater phantomUpdater = new PhantomUpdater(gameParameters);
         Investigator investigator = new Investigator(gameParameters);
 
-        List<CheckPoint> checkPoints = genCheckPoints(gameParameters);
         IntReader in = new IntReader(scanner);
         int bustersPerPlayer = in.nextInt(); // the amount of busters you control
         int ghostCnt = in.nextInt(); // the amount of ghosts on the map
@@ -22,6 +21,7 @@ public class Interactor {
         Point topLeftCorner = new Point(0, 0);
         Point myBase = myTeamId == 0 ? topLeftCorner : Utils.getEnemyBase(topLeftCorner, gameParameters);
         Point enemyBase = Utils.getEnemyBase(myBase, gameParameters);
+        List<CheckPoint> checkPoints = genCheckPoints(gameParameters, enemyBase);
 
         int[] lastStunUsed = new int[bustersPerPlayer * 2];
         Arrays.fill(lastStunUsed, -gameParameters.STUN_COOLDOWN - 5);
@@ -209,7 +209,7 @@ public class Interactor {
         return false;
     }
 
-    private List<CheckPoint> genCheckPoints(GameParameters gameParameters) {
+    private List<CheckPoint> genCheckPoints(GameParameters gameParameters, Point enemyBase) {
         List<CheckPoint> r = new ArrayList<>();
         int n = 4;
         int m = 6;
@@ -220,7 +220,13 @@ public class Interactor {
                 }
                 int x = (int) Math.round((double) i * (gameParameters.H - 1) / (n - 1));
                 int y = (int) Math.round((double) j * (gameParameters.W - 1) / (m - 1));
-                r.add(new CheckPoint(new Point(x, y)));
+                int lastSeen;
+                if (dist(x, y, enemyBase.x, enemyBase.y) <= gameParameters.H / 2) {
+                    lastSeen = -1;
+                } else {
+                    lastSeen = CheckPoint.NEVER;
+                }
+                r.add(new CheckPoint(new Point(x, y), lastSeen));
             }
         }
         return r;
