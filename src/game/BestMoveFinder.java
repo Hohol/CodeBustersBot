@@ -397,13 +397,26 @@ public class BestMoveFinder {
         GameParameters gameParameters = this.gameParameters;
         Point enemyBase = getEnemyBase(myBase, gameParameters);
         for (CheckPoint checkPoint : checkPoints) {
-            if (dist(checkPoint.p, myBase) <= dist(checkPoint.p, enemyBase) + 5) {
+            if (shouldBeeSeen(myBase, enemyBase, checkPoint.p)) {
                 if (checkPoint.lastSeen == CheckPoint.NEVER) {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    private boolean shouldBeeSeen(Point myBase, Point enemyBase, Point p) {
+        if (dist(p, myBase) <= dist(p, enemyBase) + 5) {
+            return true;
+        }
+        if (p.x == 0 && p.y == gameParameters.W - 1) {
+            return true;
+        }
+        if (p.x == gameParameters.H - 1 && p.y == 0) {
+            return true;
+        }
+        return false;
     }
 
     public Move findExploringMove(Buster buster, List<Buster> allies, Point myBase, boolean weSawCenter) {

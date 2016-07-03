@@ -194,8 +194,8 @@ public class Interactor {
                 if (i == 0 && j == 0 || i == n - 1 && j == m - 1) {
                     continue;
                 }
-                int x = (int) Math.round((double) i * gameParameters.H / (n - 1));
-                int y = (int) Math.round((double) j * gameParameters.W / (m - 1));
+                int x = (int) Math.round((double) i * (gameParameters.H - 1) / (n - 1));
+                int y = (int) Math.round((double) j * (gameParameters.W - 1) / (m - 1));
                 r.add(new CheckPoint(new Point(x, y)));
             }
         }
