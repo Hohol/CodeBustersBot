@@ -444,7 +444,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
         ally(0, 30);
         ally(0, 10).carryingGhost();
         ally(0, 10);
-        enemy(0, 10);
+        enemy(0, 10).stunCooldown(1);
         checkMove(move(25, 25));
     }
 
@@ -497,7 +497,7 @@ public class BestMoveFinderTest extends AbstractBestMoveFinderTest {
     void escortWhenEnemyAlmostWokeUp2() {
         ally(0, 20);
         ally(0, 10).carryingGhost();
-        enemy(0, 14).stunDuration(1);
+        enemy(0, 14).stunDuration(2);
         checkMove(move(25, 25));
     }
 

@@ -302,6 +302,9 @@ public class BestMoveFinder {
             if (isDangerous(courier, myBase, newCourierPosition, enemy)) {
                 dangerousEnemiesCnt++;
             }
+            if (enemy.remainingStunDuration == 0 && enemy.remainingStunCooldown == 0 && dist(enemy, courier) <= gameParameters.STUN_RANGE) {
+                return true;
+            }
         }
         int escortersCloserThanMeCnt = 0;
         for (Buster ally : allies) {
