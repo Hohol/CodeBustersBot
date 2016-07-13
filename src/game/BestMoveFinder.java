@@ -469,7 +469,7 @@ public class BestMoveFinder {
         //noinspection ConstantConditions
         Point courierPosition = new Point(closest.x, closest.y);
         int cnt = 0;
-        while (inStunRange(courierPosition, enemies)) {
+        while (inStunRange(courierPosition, enemies) && dist(courierPosition, myBase) > gameParameters.RELEASE_RANGE) {
             courierPosition = getPositionAfterMovingToBase(courierPosition.x, courierPosition.y, myBase, gameParameters);
             cnt++;
         }
